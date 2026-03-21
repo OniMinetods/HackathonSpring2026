@@ -1,9 +1,17 @@
+import { useRouter } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function HomeScreen() {
+  const router = useRouter();
+
+  const goToLogin = () => {
+    router.push('/login');
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Главная страница</Text>
+      {/* <Button title="Перейти в Login" onPress={goToLogin} /> */}
     </View>
   );
 }

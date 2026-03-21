@@ -1,0 +1,95 @@
+// features/auth/hooks/useAuth.ts
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { AuthApi } from '../api/authApi';
+import type { AuthResponse, LoginRequest, User } from '../api/authTypes';
+
+interface AuthContextType {
+  user: User | null;
+  token: string | null;
+  isLoading: boolean;
+  error: string | null;
+  login: (data: LoginRequest) => Promise<void>;
+  logout: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | null>(null);
+
+const TOKEN_KEY = 'auth_token';
+const USER_KEY = 'auth_user';
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // 🔥 автологин при старте
+  useEffect(() => {
+    const loadAuth = async () => {
+      try {
+        const savedToken = await AsyncStorage.getItem(TOKEN_KEY);
+        const savedUser = await AsyncStorage.getItem(USER_KEY);
+
+        if (savedToken && savedUser) {
+          setToken(savedToken);
+          setUser(JSON.parse(savedUser));
+        }
+      } catch (e) {
+        console.log('Ошибка загрузки auth', e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadAuth();
+  }, []);
+
+  const login = async (credentials: LoginRequest) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response: AuthResponse = await AuthApi.login(credentials);
+
+      setUser(response.user);
+      setToken(response.token);
+
+      // 💾 сохраняем
+      await AsyncStorage.setItem(TOKEN_KEY, response.token);
+      await AsyncStorage.setItem(USER_KEY, JSON.stringify(response.user));
+    } catch (err: any) {
+      setError(err.message || 'Ошибка входа');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    setUser(null);
+    setToken(null);
+
+    await AsyncStorage.removeItem(TOKEN_KEY);
+    await AsyncStorage.removeItem(USER_KEY);
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{ user, token, isLoading, error, login, logout }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+// 👇 хук для использования
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error('useAuth must be used inside AuthProvider');
+  }
+
+  return context;
+};
