@@ -36,12 +36,12 @@ class User(AbstractUser):
     volume_of_transactions = models.FloatField('Объём сделок', default=0)
     number_of_transactions = models.FloatField('Количество сделок', default=0)
     bank_share = models.FloatField('Доля банка в портфеле', default=0)
-    conversion_rate = models.IntegerField('Конверсия', default=0)
+    conversion_rate = models.IntegerField('Одобрено заявок', default=0)
 
     volume_of_transactions_plan = models.FloatField('Объём сделок ПЛАН', default=10)
     number_of_transactions_plan = models.FloatField('Количество сделок ПЛАН', default=10)
     bank_share_plan = models.FloatField('Доля банка в портфеле ПЛАН', default=50)
-    conversion_rate_plan = models.IntegerField('Конверсия ПЛАН', default=70)
+    conversion_rate_plan = models.IntegerField('Подано заявок', default=70)
 
     volume_points = models.IntegerField('Баллы за объём сделок', default=0)
     deals_points = models.IntegerField('Баллы за количество сделок', default=0)
