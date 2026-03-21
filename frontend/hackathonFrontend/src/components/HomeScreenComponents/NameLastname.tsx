@@ -15,10 +15,12 @@ export const NameLastname = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 20,
+    marginTop: 4,
+    marginBottom: 4,
   },
   text: {
     color: Colors.white,
-    fontSize: 32,
+    fontSize: 28,
+    fontWeight: 'bold',
   },
 });

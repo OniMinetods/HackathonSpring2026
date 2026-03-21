@@ -1,10 +1,11 @@
 import { FinancialForecast } from '@components/HomeScreenComponents/FinancialForecast';
 import { NameLastname, SpeedStepUp, Status } from '@components/index';
 import { Colors } from '@constants/colors';
-import { useRouter } from 'expo-router';
+// import { useRouter } from 'expo-router';
 import {
-  Button,
+  // Button,
   ImageBackground,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -13,11 +14,10 @@ import {
 import { BellIcon } from 'src/shared/lib/icons';
 
 export default function HomeScreen() {
-  const router = useRouter();
-
-  const goToLogin = () => {
-    router.push('/login');
-  };
+  // const router = useRouter();
+  // const goToLogin = () => {
+  //   router.push('/login');
+  // };
 
   const Icon = BellIcon;
 
@@ -34,22 +34,24 @@ export default function HomeScreen() {
             <Icon />
           </TouchableOpacity>
         </View>
-        <NameLastname />
-        <Status />
-        <FinancialForecast />
-        <SpeedStepUp />
-        <Button title="Перейти в Login" onPress={goToLogin} />
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <NameLastname />
+          <Text style={styles.sectionLabel}>Текущий статус</Text>
+          <Status />
+          <FinancialForecast />
+          <SpeedStepUp />
+          {/* <Button title="Перейти в Login" onPress={goToLogin} /> */}
+        </ScrollView>
       </View>
     </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
   background: {
     flex: 1,
     width: '100%',
@@ -62,9 +64,25 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.black50,
     gap: 12,
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: Colors.white,
+  },
+  sectionLabel: {
+    fontSize: 16,
+    color: Colors.primaryGrey,
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 24,
+    gap: 12,
   },
 });

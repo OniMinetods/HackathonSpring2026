@@ -36,7 +36,7 @@ export const Status = () => {
     <View style={styles.container}>
       <View style={styles.statusContainer}>
         <Icon color={getStatusColor()} />
-        <View style={{ flex: 1 }}>
+        <View style={styles.statusTextCol}>
           <Text style={styles.statusText}>
             {status[0].toLocaleUpperCase() + status.slice(1)}
           </Text>
@@ -66,22 +66,28 @@ export const Status = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.black50,
+    backgroundColor: Colors.primaryDark,
     borderRadius: 20,
     padding: 20,
-    gap: 20,
+    gap: 16,
+  },
+  statusTextCol: {
+    flex: 1,
+    gap: 4,
   },
   statusText: {
     color: Colors.white,
-    fontSize: 46,
+    fontSize: 36,
+    fontWeight: 'bold',
   },
   text: {
     color: Colors.white,
-    fontSize: 24,
+    fontSize: 18,
+    lineHeight: 24,
   },
   statusContainer: {
     flexDirection: 'row',
-    gap: 20,
+    gap: 16,
     alignItems: 'center',
   },
   textContainer: {},
@@ -89,7 +95,7 @@ const styles = StyleSheet.create({
     height: 10,
     backgroundColor: Colors.primaryGrey,
     borderRadius: 5,
-    marginTop: 10,
+    marginTop: 8,
     overflow: 'hidden',
   },
   progressFill: {

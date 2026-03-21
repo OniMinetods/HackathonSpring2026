@@ -17,12 +17,14 @@ export const SpeedStepUp = () => {
 const styles = StyleSheet.create({
   container: {
     borderRadius: 20,
-    padding: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 20,
     backgroundColor: Colors.primaryGreenFirst,
   },
   text: {
     textAlign: 'center',
     color: Colors.white,
-    fontSize: 20,
+    fontSize: 18,
+    fontWeight: '600',
   },
 });
