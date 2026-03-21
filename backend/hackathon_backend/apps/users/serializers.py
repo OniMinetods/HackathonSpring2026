@@ -3,20 +3,13 @@ from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    total_points = serializers.ReadOnlyField()
+    total_points = serializers.FloatField(read_only=True)
+    points_to_next_status = serializers.SerializerMethodField()
     full_name = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = [
-            'id', 'username', 'first_name', 'last_name', 'patronymic', 'full_name',
-            'email', 'phone', 'dealer_code', 'position', 'level',
-            'registration_date', 'sber_id', 'total_points',
-            'volume_of_transactions', 'number_of_transactions', 'bank_share', 'conversion_rate',
-            'volume_of_transactions_plan', 'number_of_transactions_plan',
-            'bank_share_plan', 'conversion_rate_plan',
-            'is_blocked', 'block_reason'
-        ]
+        fields = '__all__'
         read_only_fields = ['id', 'registration_date', 'total_points']
 
     def get_full_name(self, obj):
@@ -24,6 +17,9 @@ class UserSerializer(serializers.ModelSerializer):
             return f"{obj.last_name} {obj.first_name} {obj.patronymic}"
         return f"{obj.last_name} {obj.first_name}"
 
+    def get_points_to_next_status(self, obj):
+        """Возвращает количество баллов до следующего статуса."""
+        return obj.points_to_next_status()
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:

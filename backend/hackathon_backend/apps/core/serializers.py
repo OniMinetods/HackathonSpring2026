@@ -21,7 +21,7 @@ def get_level_by_score(score):
     - Black: 90+ баллов
     """
     if score >= 90:
-        return {'slug': 'black', 'name': 'Black', 'min_points': 90}
+        return {'slug': 'platinum', 'name': 'Black', 'min_points': 90}
     elif score >= 70:
         return {'slug': 'gold', 'name': 'Gold', 'min_points': 70}
     else:
