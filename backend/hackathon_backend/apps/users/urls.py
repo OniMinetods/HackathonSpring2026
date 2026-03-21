@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from . import views
 
 router = DefaultRouter()
-router.register('users', views.UserViewSet, basename='users')
+router.register('profile', views.UserViewSet, basename='profile')
 router.register('auth', views.LoginViewSet, basename='auth')
 router.register('plans', views.MonthlyPlanViewSet, basename='plans')
 router.register('applications', views.ApplicationViewSet, basename='applications')
