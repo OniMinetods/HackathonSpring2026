@@ -1,4 +1,4 @@
-import { Status } from '@components/index';
+import { NameLastname, Status } from '@components/index';
 import { Colors } from '@constants/colors';
 import { useRouter } from 'expo-router';
 import { Button, StyleSheet, Text, View } from 'react-native';
@@ -13,6 +13,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Главная страница</Text>
+      <NameLastname />
       <Status />
       <Button title="Перейти в Login" onPress={goToLogin} />
     </View>

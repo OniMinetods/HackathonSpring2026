@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { UserStatus } from 'src/features/auth/api/authTypes';
 import { useAuth } from 'src/features/auth/hooks/useAuth';
-import { numberParser } from 'src/shared/functions';
+import { getNextStatus, numberParser } from 'src/shared/functions';
 import { StatusIcon } from 'src/shared/lib/icons';
 
 export const Status = () => {
@@ -39,15 +39,9 @@ export const Status = () => {
         </View>
       </View>
       <View style={styles.textContainer}>
-        {status === 'silver' ? (
-          <Text
-            style={styles.text}
-          >{`До Gold осталось ${user?.volume_points} ${numberParser(0)}`}</Text>
-        ) : status === 'gold' ? (
-          <Text
-            style={styles.text}
-          >{`До Platinum осталось ${user?.volume_points} баллов`}</Text>
-        ) : null}
+        <Text
+          style={styles.text}
+        >{`До ${getNextStatus(status)} осталось ${user?.volume_points || user?.total_points} ${numberParser(0)}`}</Text>
       </View>
     </View>
   );
