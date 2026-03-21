@@ -3,7 +3,6 @@ from django.conf import settings
 
 
 class Level(models.Model):
-    """Модель уровня (Silver, Gold, Black и т.д.)."""
     name = models.CharField('Название', max_length=50)
     slug = models.SlugField(unique=True)
     min_points = models.FloatField('Минимальное количество баллов')
@@ -23,12 +22,10 @@ class Level(models.Model):
         ordering = ['min_points']
 
     def __str__(self):
-        """Возвращает название уровня."""
         return self.name
 
 
 class Privilege(models.Model):
-    """Модель привилегии, доступной на определённом уровне."""
     STATUS_CHOICES = [
         ('active', 'Активна'),
         ('locked', 'Заблокирована'),
@@ -47,12 +44,10 @@ class Privilege(models.Model):
         verbose_name_plural = 'Привилегии'
 
     def __str__(self):
-        """Возвращает строку вида 'Уровень: Название привилегии'."""
         return f'{self.level.name}: {self.title}'
 
 
 class Deal(models.Model):
-    """Модель сделки (кредитной)."""
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='deals')
     date = models.DateField('Дата сделки', auto_now_add=True)
     amount = models.DecimalField('Сумма кредита', max_digits=15, decimal_places=2)
@@ -64,12 +59,10 @@ class Deal(models.Model):
         verbose_name_plural = 'Сделки'
 
     def __str__(self):
-        """Возвращает информацию о сделке: пользователь и сумма."""
         return f'{self.user} - {self.amount} ₽'
 
 
 class DailyResult(models.Model):
-    """Модель ежедневных результатов пользователя."""
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='daily_results')
     date = models.DateField('Дата', auto_now_add=True)
     deals_count = models.IntegerField('Оформлено сделок за день', default=0)
@@ -83,7 +76,6 @@ class DailyResult(models.Model):
 
 
 class Task(models.Model):
-    """Модель задачи (глобальной)."""
     TASK_TYPE_CHOICES = [
         ('deal', 'Сделка'),
         ('volume', 'Объём'),
@@ -104,12 +96,10 @@ class Task(models.Model):
         verbose_name_plural = 'Задачи'
 
     def __str__(self):
-        """Возвращает название задачи."""
         return self.title
 
 
 class UserTask(models.Model):
-    """Модель выполнения задачи конкретным пользователем."""
     STATUS_CHOICES = [
         ('in_progress', 'В процессе'),
         ('completed', 'Выполнена'),
@@ -130,18 +120,15 @@ class UserTask(models.Model):
 
     @property
     def progress_percent(self):
-        """Вычисляет процент выполнения задачи."""
         if self.task.target_value > 0:
             return min(100, (self.current_value / self.task.target_value) * 100)
         return 0
 
     def __str__(self):
-        """Возвращает строку с пользователем, задачей и процентом выполнения."""
         return f'{self.user}: {self.task.title} - {self.progress_percent:.0f}%'
 
 
 class Rating(models.Model):
-    """Модель рейтинга пользователя на определённую дату."""
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='ratings')
     date = models.DateField('Дата расчёта', auto_now_add=True)
     total_points = models.FloatField('Общее количество баллов', default=0)
@@ -160,7 +147,6 @@ class Rating(models.Model):
 
 
 class News(models.Model):
-    """Модель новостей."""
     title = models.CharField('Заголовок', max_length=200)
     content = models.TextField('Содержание')
     image = models.ImageField('Изображение', upload_to='news/', blank=True)
@@ -174,12 +160,10 @@ class News(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        """Возвращает заголовок новости."""
         return self.title
 
 
 class TrainingModule(models.Model):
-    """Модель обучающего модуля."""
     title = models.CharField('Название', max_length=200)
     description = models.TextField('Описание', blank=True)
     is_video = models.BooleanField('Видеоурок', default=False)
@@ -194,12 +178,10 @@ class TrainingModule(models.Model):
         ordering = ['order']
 
     def __str__(self):
-        """Возвращает название модуля."""
         return self.title
 
 
 class TrainingTest(models.Model):
-    """Модель вопроса теста для модуля."""
     module = models.ForeignKey(TrainingModule, on_delete=models.CASCADE, related_name='tests')
     question = models.TextField('Вопрос')
     correct_answer = models.CharField('Правильный ответ', max_length=500)
@@ -209,12 +191,10 @@ class TrainingTest(models.Model):
         verbose_name_plural = 'Вопросы тестов'
 
     def __str__(self):
-        """Возвращает строку с названием модуля и первыми 50 символами вопроса."""
         return f'{self.module.title}: {self.question[:50]}'
 
 
 class UserTraining(models.Model):
-    """Модель прохождения обучения пользователем."""
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='trainings')
     module = models.ForeignKey(TrainingModule, on_delete=models.CASCADE, related_name='user_trainings')
     is_completed = models.BooleanField('Пройден', default=False)
@@ -229,7 +209,6 @@ class UserTraining(models.Model):
 
 
 class SupportTicket(models.Model):
-    """Модель обращения в поддержку."""
     STATUS_CHOICES = [
         ('new', 'Новое'),
         ('in_progress', 'В работе'),
@@ -251,12 +230,10 @@ class SupportTicket(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        """Возвращает строку с пользователем и темой обращения."""
         return f'{self.user}: {self.subject}'
 
 
 class SupportMessage(models.Model):
-    """Модель сообщения в рамках обращения."""
     ticket = models.ForeignKey(SupportTicket, on_delete=models.CASCADE, related_name='messages')
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     message = models.TextField('Сообщение')
@@ -270,7 +247,6 @@ class SupportMessage(models.Model):
 
 
 class Bonus(models.Model):
-    """Модель начисленных бонусов пользователю."""
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='bonuses')
     amount = models.DecimalField('Сумма', max_digits=12, decimal_places=2)
     description = models.TextField('Описание')
@@ -282,5 +258,4 @@ class Bonus(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        """Возвращает строку с пользователем и суммой бонуса."""
         return f'{self.user}: {self.amount} ₽'

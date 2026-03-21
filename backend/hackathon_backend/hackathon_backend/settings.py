@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from celery.schedules import crontab
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -106,18 +105,3 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
-
-##для подсчёта времени
-
-
-from celery.schedules import crontab
-
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-
-CELERY_BEAT_SCHEDULE = {
-    'calculate-monthly-ratings': {
-        'task': 'apps.core.tasks.calculate_monthly_ratings',
-        'schedule': crontab(day_of_month=1, hour=0, minute=0),
-    },
-}
