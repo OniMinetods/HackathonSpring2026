@@ -1,12 +1,26 @@
 import { Colors } from '@constants/colors';
+import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { UserStatus } from 'src/features/auth/api/authTypes';
+import { useAuth } from 'src/features/auth/hooks/useAuth';
 
 export const ProfileProgramCard = () => {
+  const { user } = useAuth();
+
+  // const [dateJoined, setDateJoined] = useState('');
+  const [status, setStatus] = useState<UserStatus>('silver');
+
+  useEffect(() => {
+    if (user) {
+      setStatus(user?.status);
+    }
+  });
+
   return (
     <View style={styles.card}>
       <View style={styles.row}>
         <Text style={styles.label}>Уровень привилегий</Text>
-        <Text style={styles.badge}>Gold</Text>
+        <Text style={styles.badge}>{status}</Text>
       </View>
       <View style={styles.divider} />
       <View style={styles.row}>

@@ -1,5 +1,7 @@
 import { Colors } from '@constants/colors';
+import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useAuth } from 'src/features/auth/hooks/useAuth';
 
 type RowProps = { label: string; value: string };
 
@@ -11,15 +13,30 @@ const Row = ({ label, value }: RowProps) => (
 );
 
 export const ProfileInfoCard = () => {
+  const { user } = useAuth();
+  const [dealerCode, setDealerCode] = useState<string>('');
+  const [position, setPosition] = useState<string>('');
+  const [phone, setPhone] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+
+  useEffect(() => {
+    if (user) {
+      setDealerCode(user.dealer_code);
+      setPosition(user.position);
+      setPhone(user.phone);
+      setEmail(user.email);
+    }
+  }, [user]);
+
   return (
     <View style={styles.card}>
-      <Row label="Код ДЦ" value="MSK-042" />
+      <Row label="Код ДЦ" value={dealerCode} />
       <View style={styles.divider} />
-      <Row label="Должность" value="Менеджер по продажам" />
+      <Row label="Должность" value={position} />
       <View style={styles.divider} />
-      <Row label="Телефон" value="+7 (900) 000-00-00" />
+      <Row label="Телефон" value={phone} />
       <View style={styles.divider} />
-      <Row label="Почта" value="i.ivanov@example.com" />
+      <Row label="Почта" value={email} />
     </View>
   );
 };
