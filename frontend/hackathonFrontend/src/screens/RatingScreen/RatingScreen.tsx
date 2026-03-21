@@ -1,3 +1,4 @@
+import { CalculatorEntryButton } from '@components/CalculatorScreenComponents/CalculatorEntryButton';
 import { RatingDealerTop } from '@components/RatingScreenComponents/RatingDealerTop';
 import { RatingMyRank } from '@components/RatingScreenComponents/RatingMyRank';
 import { RatingRegionTop } from '@components/RatingScreenComponents/RatingRegionTop';
@@ -34,6 +35,7 @@ export default function RatingScreen() {
           showsVerticalScrollIndicator={false}
         >
           <RatingMyRank />
+          <CalculatorEntryButton title="Смоделировать рост" />
           <RatingDealerTop />
           <RatingRegionTop />
         </ScrollView>

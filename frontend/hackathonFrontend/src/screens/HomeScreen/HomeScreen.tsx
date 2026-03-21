@@ -1,8 +1,10 @@
 import { FinancialForecast } from '@components/HomeScreenComponents/FinancialForecast';
 import { NameLastname, SpeedStepUp, Status } from '@components/index';
 import { Colors } from '@constants/colors';
+import { useRouter } from 'expo-router';
 // import { useRouter } from 'expo-router';
 import {
+  Button,
   // Button,
   ImageBackground,
   ScrollView,
@@ -14,10 +16,10 @@ import {
 import { BellIcon } from 'src/shared/lib/icons';
 
 export default function HomeScreen() {
-  // const router = useRouter();
-  // const goToLogin = () => {
-  //   router.push('/login');
-  // };
+  const router = useRouter();
+  const goToLogin = () => {
+    router.push('/login');
+  };
 
   const Icon = BellIcon;
 
@@ -44,7 +46,7 @@ export default function HomeScreen() {
           <Status />
           <FinancialForecast />
           <SpeedStepUp />
-          {/* <Button title="Перейти в Login" onPress={goToLogin} /> */}
+          <Button title="Перейти в Login" onPress={goToLogin} />
         </ScrollView>
       </View>
     </ImageBackground>

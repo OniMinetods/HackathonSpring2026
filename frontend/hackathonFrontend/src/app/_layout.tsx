@@ -1,8 +1,8 @@
-import { Stack } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { useAuth } from '../features/auth/hooks/useAuth';
-import { Providers } from './providers';
+import { Stack } from 'expo-router'
+import { StyleSheet, View } from 'react-native'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
+import { useAuth } from '../features/auth/hooks/useAuth'
+import { Providers } from './providers'
 
 function RootNavigator() {
   const { token, isLoading } = useAuth();
@@ -11,7 +11,14 @@ function RootNavigator() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      {token ? <Stack.Screen name="(tabs)" /> : <Stack.Screen name="login" />}
+      {token ? (
+        <View>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="calculator" />
+        </View>
+      ) : (
+        <Stack.Screen name="login" />
+      )}
     </Stack>
   );
 }
