@@ -7,7 +7,7 @@ from .models import User
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     list_display = ('username', 'last_name', 'first_name', 'patronymic', 'dealer_code',
-                    'position', 'status', 'total_points')
+                    'position', 'status', 'total_points', 'volume_points', 'deals_points', 'share_points', 'conversion_points')
     list_filter = ('status', 'position', 'is_active')
     search_fields = ('username', 'last_name', 'first_name', 'dealer_code', 'phone')
 
@@ -17,13 +17,14 @@ class CustomUserAdmin(UserAdmin):
             'fields': (
                 'last_name', 'first_name', 'patronymic', 'dealer_code',
                 'position', 'phone', 'email', 'status',
-                'registration_date', 'sber_id'
+                'date_joined', 'sber_id'
             )
         }),
         (_('Статистика'), {
             'fields': (
                 'volume_of_transactions', 'number_of_transactions', 'bank_share',
-                'conversion_rate', 'total_points'
+                'conversion_rate', 'volume_points', 'deals_points', 'share_points',
+                'conversion_points', 'total_points'
             )
         }),
         (_('Плановые показатели'), {
@@ -37,4 +38,4 @@ class CustomUserAdmin(UserAdmin):
         # }),
     )
 
-    readonly_fields = ('registration_date', 'last_login', 'date_joined', 'total_points')
+    readonly_fields = ('date_joined', 'date_joined', 'total_points', 'volume_points', 'deals_points', 'share_points',  'conversion_points')

@@ -30,18 +30,23 @@ class User(AbstractUser):
     position = models.CharField('Должность', max_length=20, choices=ROLE_CHOICES, default='manager')
     phone = models.CharField('Телефон', max_length=20, blank=True)
     status = models.CharField('Уровень привилегии', max_length=20, choices=STATUS_CHOICES, default='silver')
-    registration_date = models.DateTimeField('Дата регистрации', auto_now_add=True)
+
     sber_id = models.CharField('Sber ID', max_length=100, blank=True)
 
-    volume_of_transactions = models.FloatField('Объём сделок в рублях', default=0)
+    volume_of_transactions = models.FloatField('Объём сделок', default=0)
     number_of_transactions = models.FloatField('Количество сделок', default=0)
     bank_share = models.FloatField('Доля банка в портфеле', default=0)
     conversion_rate = models.IntegerField('Конверсия', default=0)
 
-    volume_of_transactions_plan = models.FloatField('Объём сделок в рублях ПЛАН', default=10)
+    volume_of_transactions_plan = models.FloatField('Объём сделок ПЛАН', default=10)
     number_of_transactions_plan = models.FloatField('Количество сделок ПЛАН', default=10)
     bank_share_plan = models.FloatField('Доля банка в портфеле ПЛАН', default=50)
     conversion_rate_plan = models.IntegerField('Конверсия ПЛАН', default=70)
+
+    volume_points = models.IntegerField('Баллы за объём сделок', default=0)
+    deals_points = models.IntegerField('Баллы за количество сделок', default=0)
+    share_points = models.IntegerField('Баллы за долю банка', default=0)
+    conversion_points = models.IntegerField('Баллы за конверсию', default=0)
 
     last_status_update = models.DateTimeField('Дата последнего обновления уровня', blank=True, null=True)
 
@@ -69,29 +74,34 @@ class User(AbstractUser):
 
     @property
     def total_points(self):
-        """Вычисляет итоговые баллы."""
-        vol_index = self._safe_divide(
+        """Возвращает общий балл и все компоненты."""
+        vol_part = min(120, self._safe_divide(
             self.volume_of_transactions,
-            self.volume_of_transactions_plan,
-            max_value=120
-        )
-        deals_index = self._safe_divide(
+            self.volume_of_transactions_plan
+        )) * 0.35
+
+        deals_part = self._safe_divide(
             self.number_of_transactions,
             self.number_of_transactions_plan
-        )
-        share_index = self._safe_divide(
+        ) * 0.25
+
+        share_part = self._safe_divide(
             self.bank_share,
             self.bank_share_plan
-        )
-        conv_index = self._safe_divide(
+        ) * 0.25
+
+        conv_part = self._safe_divide(
             self.conversion_rate,
             self.conversion_rate_plan
-        )
+        ) * 0.15
 
-        total = (0.35 * vol_index +
-                 0.25 * deals_index +
-                 0.25 * share_index +
-                 0.15 * conv_index)
+        total = vol_part + deals_part + share_part + conv_part
+
+        # Обновляем поля в объекте (опционально)
+        self.volume_points = round(vol_part, 2)
+        self.deals_points = round(deals_part, 2)
+        self.share_points = round(share_part, 2)
+        self.conversion_points = round(conv_part, 2)
 
         return round(total, 2)
 
