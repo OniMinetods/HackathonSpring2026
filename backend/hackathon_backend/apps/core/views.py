@@ -20,16 +20,19 @@ from .serializers import (
 
 
 class LevelViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet для чтения уровней. Доступен всем."""
     queryset = Level.objects.all()
     serializer_class = LevelSerializer
     permission_classes = [AllowAny]
 
 
 class PrivilegeViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet для чтения привилегий. Доступен аутентифицированным."""
     serializer_class = PrivilegeSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        """Фильтрует привилегии по параметру level (slug)."""
         queryset = Privilege.objects.all()
         level = self.request.query_params.get('level')
         if level:
@@ -38,10 +41,20 @@ class PrivilegeViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class DashboardViewSet(viewsets.ViewSet):
+    """ViewSet для дашборда пользователя."""
     permission_classes = [IsAuthenticated]
 
     @action(detail=False, methods=['get'])
     def my_status(self, request):
+        """
+        Возвращает статус пользователя:
+        - текущий уровень
+        - следующий уровень
+        - прогресс до следующего уровня
+        - баллы до следующего уровня
+        - статистику за сегодня (сделки, объём, доп. продукты)
+        - общие баллы и их разбивку.
+        """
         user = request.user
         levels = Level.objects.all()
 
@@ -104,10 +117,18 @@ class DashboardViewSet(viewsets.ViewSet):
 
 
 class FinancialEffectViewSet(viewsets.ViewSet):
+    """ViewSet для финансового эффекта пользователя."""
     permission_classes = [IsAuthenticated]
 
     @action(detail=False, methods=['get'])
     def my_effect(self, request):
+        """
+        Возвращает финансовый эффект пользователя:
+        - сумма бонусов
+        - выгода от текущего уровня
+        - экономия по ипотеке, кэшбэк, стоимость ДМС
+        - общая выгода.
+        """
         user = request.user
 
         total_bonuses = Bonus.objects.filter(user=user).aggregate(Sum('amount'))['amount__sum'] or 0
@@ -136,10 +157,17 @@ class FinancialEffectViewSet(viewsets.ViewSet):
 
 
 class RatingViewSet(viewsets.ViewSet):
+    """ViewSet для рейтингов."""
     permission_classes = [IsAuthenticated]
 
     @action(detail=False, methods=['get'])
     def my_rating(self, request):
+        """
+        Возвращает:
+        - топ внутри дилера (dealer_top) и место пользователя (dealer_rank)
+        - топ в регионе (region_top) и место (region_rank)
+        - глобальный топ (global_top) и место (global_rank)
+        """
         from django.contrib.auth import get_user_model
         User = get_user_model()
 
@@ -192,6 +220,9 @@ class RatingViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=['get'])
     def detail(self, request):
+        """
+        Возвращает детальную информацию о баллах пользователя и формулы расчёта.
+        """
         user = request.user
         return Response({
             'volume_points': user.volume_points,
@@ -205,10 +236,20 @@ class RatingViewSet(viewsets.ViewSet):
 
 
 class CalculatorViewSet(viewsets.ViewSet):
+    """ViewSet для калькулятора баллов."""
     permission_classes = [IsAuthenticated]
 
     @action(detail=False, methods=['post'])
     def simulate(self, request):
+        """
+        Симулирует изменение баллов при добавлении дополнительных показателей.
+        Принимает:
+        - additional_deals (доп. сделки)
+        - additional_volume (доп. объём)
+        - additional_share (доп. доля)
+        - additional_products (доп. продукты)
+        Возвращает новые баллы, достигнутый уровень и финансовый эффект.
+        """
         serializer = CalculatorRequestSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -241,24 +282,34 @@ class CalculatorViewSet(viewsets.ViewSet):
 
 
 class DealViewSet(viewsets.ModelViewSet):
+    """ViewSet для сделок пользователя."""
     serializer_class = DealSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        """Возвращает только сделки текущего пользователя."""
         return Deal.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
+        """При создании сделки автоматически назначает текущего пользователя."""
         serializer.save(user=self.request.user)
 
 
 class DailyResultViewSet(viewsets.ModelViewSet):
+    """ViewSet для ежедневных результатов."""
     serializer_class = DailyResultSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        """Возвращает результаты только текущего пользователя."""
         return DailyResult.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
+        """
+        Создаёт или обновляет результат дня.
+        Обновляет общие показатели пользователя (total_deals, total_volume)
+        и создаёт соответствующие сделки.
+        """
         today = timezone.now().date()
         daily_result, created = DailyResult.objects.get_or_create(
             user=self.request.user,
@@ -286,35 +337,41 @@ class DailyResultViewSet(viewsets.ModelViewSet):
 
 
 class TaskViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet для чтения задач."""
     queryset = Task.objects.filter(is_active=True)
     serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated]
 
     @action(detail=False, methods=['get'])
     def my_tasks(self, request):
+        """Возвращает задачи пользователя с прогрессом."""
         user_tasks = UserTask.objects.filter(user=request.user)
         serializer = UserTaskSerializer(user_tasks, many=True)
         return Response(serializer.data)
 
 
 class NewsViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet для чтения новостей. Доступен всем."""
     queryset = News.objects.filter(is_published=True)
     serializer_class = NewsSerializer
     permission_classes = [AllowAny]
 
 
 class TrainingViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet для обучающих модулей."""
     queryset = TrainingModule.objects.all()
     serializer_class = TrainingModuleSerializer
     permission_classes = [IsAuthenticated]
 
     def get_serializer_context(self):
+        """Передаёт request в контекст сериализатора."""
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
 
     @action(detail=True, methods=['get'])
     def test(self, request, pk=None):
+        """Возвращает вопросы теста для указанного модуля."""
         module = self.get_object()
         tests = TrainingTest.objects.filter(module=module)
         serializer = TrainingTestSerializer(tests, many=True)
@@ -322,6 +379,11 @@ class TrainingViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=True, methods=['post'])
     def complete(self, request, pk=None):
+        """
+        Завершает модуль: проверяет ответы на тест,
+        начисляет баллы при успешной сдаче (score >= 70),
+        сохраняет результат.
+        """
         module = self.get_object()
         answers = request.data.get('answers', {})
 
@@ -364,17 +426,24 @@ class TrainingViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class SupportViewSet(viewsets.ModelViewSet):
+    """ViewSet для обращений в поддержку."""
     serializer_class = SupportTicketSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        """Возвращает обращения только текущего пользователя."""
         return SupportTicket.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
+        """При создании обращения назначает текущего пользователя."""
         serializer.save(user=self.request.user)
 
     @action(detail=True, methods=['get', 'post'])
     def messages(self, request, pk=None):
+        """
+        GET: возвращает список сообщений в обращении.
+        POST: добавляет новое сообщение от пользователя.
+        """
         ticket = self.get_object()
 
         if request.method == 'GET':
@@ -395,8 +464,69 @@ class SupportViewSet(viewsets.ModelViewSet):
 
 
 class BonusViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet для чтения бонусов пользователя."""
     serializer_class = BonusSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        """Возвращает бонусы только текущего пользователя."""
         return Bonus.objects.filter(user=self.request.user)
+
+
+class DashboardViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=False, methods=['get'])
+    def my_status(self, request):
+        user = request.user
+
+        # Получаем последний рассчитанный рейтинг
+        last_rating = user.monthly_ratings.order_by('-year', '-month').first()
+        if last_rating:
+            current_points = last_rating.total_points
+        else:
+            current_points = 0
+
+        # Определяем текущий уровень
+        current_level = user.level  # или определить по current_points
+
+        # Находим следующий уровень
+        if current_points < 70:
+            next_level = 'gold'
+            points_to_next = 70 - current_points
+        elif 70 <= current_points < 90:
+            next_level = 'black'
+            points_to_next = 90 - current_points
+        else:
+            next_level = None
+            points_to_next = 0
+
+        progress_to_next = (current_points / 70 * 100) if next_level == 'gold' else \
+                           ((current_points - 70) / 20 * 100) if next_level == 'black' else 100
+
+        # Статистика за сегодня (оставляем как было)
+        today = timezone.now().date()
+        today_deals = Deal.objects.filter(user=user, date=today).aggregate(
+            deals_count=Count('id'),
+            volume=Sum('amount')
+        )
+        today_products = Deal.objects.filter(user=user, date=today).aggregate(
+            products=Sum('additional_products')
+        )
+        today_stats = {
+            'deals_count': today_deals['deals_count'] or 0,
+            'volume': today_deals['volume'] or 0,
+            'additional_products': today_products['products'] or 0
+        }
+
+        # Возвращаем данные
+        data = {
+            'current_level': current_level,
+            'next_level': next_level,
+            'progress_to_next': progress_to_next,
+            'points_to_next': points_to_next,
+            'current_points': current_points,
+            'today_stats': today_stats,
+            # можно добавить breakdown индексов из last_rating
+        }
+        return Response(data)
