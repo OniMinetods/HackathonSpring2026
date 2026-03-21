@@ -15,6 +15,7 @@ class User(AbstractUser):
         ('gold', 'Gold'),
         ('black', 'Black'),
     ]
+    patronymic = models.CharField('Отчество', max_length=150, blank=True)
     dealer_code = models.CharField('Код ДЦ', max_length=50, blank=True)
     position = models.CharField('Должность', max_length=20, choices=ROLE_CHOICES, default='manager')
     phone = models.CharField('Телефон', max_length=20, blank=True)
