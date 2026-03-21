@@ -1,4 +1,5 @@
 import { Stack } from 'expo-router';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useAuth } from '../features/auth/hooks/useAuth';
 import { Providers } from './providers';
@@ -19,8 +20,17 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <Providers>
-        <RootNavigator />
+        <View style={styles.background}>
+          <RootNavigator />
+        </View>
       </Providers>
     </SafeAreaProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    backgroundColor: '#111111',
+  },
+});
