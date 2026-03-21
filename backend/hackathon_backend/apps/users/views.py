@@ -8,28 +8,32 @@ from .models import User
 from .serializers import UserSerializer, UserProfileUpdateSerializer
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+class UserViewSet(viewsets.GenericViewSet):
+    """ViewSet только для получения и обновления профиля"""
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        if self.request.user.is_staff:
-            return User.objects.all()
         return User.objects.filter(id=self.request.user.id)
 
-    @action(detail=False, methods=['get', 'put'], permission_classes=[IsAuthenticated])
-    def me(self, request):
+    @action(detail=False, methods=['get', 'patch'], url_path='profile', url_name='profile')
+    def profile(self, request):
+        """Получение или обновление профиля"""
         if request.method == 'GET':
             serializer = self.get_serializer(request.user)
             return Response(serializer.data)
-        # elif request.method == 'PUT':
-        #     serializer = UserProfileUpdateSerializer(request.user, data=request.data, partial=True)
-        #     if serializer.is_valid():
-        #         serializer.save()
-        #         return Response(self.get_serializer(request.user).data)
+
+        elif request.method == 'PATCH':
+            serializer = UserProfileUpdateSerializer(request.user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(self.get_serializer(request.user).data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        return Response(
+            {'error': 'Method not allowed'},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )
 
 class LoginViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]

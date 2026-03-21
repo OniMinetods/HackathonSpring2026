@@ -7,8 +7,8 @@ from .models import User
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     list_display = ('username', 'last_name', 'first_name', 'patronymic', 'dealer_code',
-                    'position', 'status', 'is_blocked', 'total_points')
-    list_filter = ('status', 'position', 'is_blocked', 'is_active')
+                    'position', 'status', 'total_points')
+    list_filter = ('status', 'position', 'is_active')
     search_fields = ('username', 'last_name', 'first_name', 'dealer_code', 'phone')
 
     fieldsets = (
@@ -32,10 +32,9 @@ class CustomUserAdmin(UserAdmin):
                 'bank_share_plan', 'conversion_rate_plan'
             )
         }),
-        (_('Права доступа'), {
-            'fields': ('is_active', 'is_staff', 'is_superuser', 'is_blocked',
-                      'block_reason', 'groups', 'user_permissions'),
-        }),
+        # (_('Права доступа'), {
+        #     'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+        # }),
     )
 
     readonly_fields = ('registration_date', 'last_login', 'date_joined', 'total_points')

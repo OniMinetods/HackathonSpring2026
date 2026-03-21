@@ -45,8 +45,6 @@ class User(AbstractUser):
 
     last_status_update = models.DateTimeField('Дата последнего обновления уровня', blank=True, null=True)
 
-    is_blocked = models.BooleanField('Заблокирован', default=False)
-    block_reason = models.TextField('Причина блокировки', blank=True)
 
     class Meta:
         verbose_name = 'Пользователь'
