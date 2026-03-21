@@ -10,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'username', 'first_name', 'last_name', 'patronymic', 'full_name',
-            'email', 'phone', 'dealer_code', 'dealer_name', 'position', 'level',
+            'email', 'phone', 'dealer_code', 'position', 'level',
             'registration_date', 'sber_id', 'total_points', 'volume_points',
             'deals_points', 'share_points', 'total_deals', 'total_volume',
             'bank_share', 'is_blocked'

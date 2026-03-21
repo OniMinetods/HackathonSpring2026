@@ -5,13 +5,13 @@ from .models import User
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    list_display = ('username', 'last_name', 'first_name', 'dealer_code', 'level', 'total_points', 'is_blocked')
+    list_display = ('username', 'last_name', 'first_name', 'patronymic', 'dealer_code', 'level', 'total_points', 'is_blocked')
     list_filter = ('level', 'position', 'is_blocked', 'is_active')
     search_fields = ('username', 'last_name', 'first_name', 'dealer_code', 'phone')
 
     fieldsets = UserAdmin.fieldsets + (
         ('Дополнительная информация', {
-            'fields': ('patronymic', 'dealer_code', 'dealer_name', 'position', 'phone', 'level',
+            'fields': ('dealer_code', 'position', 'phone', 'level',
                        'sber_id', 'registration_date', 'is_blocked', 'block_reason')
         }),
         ('Статистика', {

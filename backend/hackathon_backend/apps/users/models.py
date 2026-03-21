@@ -15,10 +15,7 @@ class User(AbstractUser):
         ('gold', 'Gold'),
         ('black', 'Black'),
     ]
-
-    patronymic = models.CharField('Отчество', max_length=150, blank=True)
     dealer_code = models.CharField('Код ДЦ', max_length=50, blank=True)
-    dealer_name = models.CharField('Название ДЦ', max_length=200, blank=True)
     position = models.CharField('Должность', max_length=20, choices=ROLE_CHOICES, default='manager')
     phone = models.CharField('Телефон', max_length=20, blank=True)
     level = models.CharField('Уровень привилегии', max_length=20, choices=LEVEL_CHOICES, default='silver')
@@ -45,4 +42,4 @@ class User(AbstractUser):
         return self.volume_points + self.deals_points + self.share_points
 
     def __str__(self):
-        return f'{self.last_name} {self.first_name}'
+        return f'{self.last_name} {self.first_name} {self.patronymic}'

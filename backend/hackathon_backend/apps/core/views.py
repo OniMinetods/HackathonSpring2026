@@ -170,7 +170,6 @@ class RatingViewSet(viewsets.ViewSet):
                 'id': u.id,
                 'full_name': u.get_full_name(),
                 'level': u.level,
-                'dealer_name': u.dealer_name,
                 'total_points': u.total_points
             })
             if u.id == user.id:
