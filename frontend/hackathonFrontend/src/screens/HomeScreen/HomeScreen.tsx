@@ -1,7 +1,16 @@
-import { NameLastname, Status } from '@components/index';
+import { FinancialForecast } from '@components/HomeScreenComponents/FinancialForecast';
+import { NameLastname, SpeedStepUp, Status } from '@components/index';
 import { Colors } from '@constants/colors';
 import { useRouter } from 'expo-router';
-import { Button, StyleSheet, Text, View } from 'react-native';
+import {
+  Button,
+  ImageBackground,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { BellIcon } from 'src/shared/lib/icons';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -10,22 +19,48 @@ export default function HomeScreen() {
     router.push('/login');
   };
 
+  const Icon = BellIcon;
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Главная страница</Text>
-      <NameLastname />
-      <Status />
-      <Button title="Перейти в Login" onPress={goToLogin} />
-    </View>
+    <ImageBackground
+      style={styles.background}
+      source={require('../../shared/lib/public/img/sberBackground.png')}
+      resizeMode="cover"
+    >
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Главная</Text>
+          <TouchableOpacity>
+            <Icon />
+          </TouchableOpacity>
+        </View>
+        <NameLastname />
+        <Status />
+        <FinancialForecast />
+        <SpeedStepUp />
+        <Button title="Перейти в Login" onPress={goToLogin} />
+      </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  background: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
   container: {
     paddingTop: 50,
     paddingHorizontal: 12,
     flex: 1,
-    backgroundColor: Colors.black,
+    backgroundColor: Colors.black50,
+    gap: 12,
   },
   title: {
     fontSize: 24,

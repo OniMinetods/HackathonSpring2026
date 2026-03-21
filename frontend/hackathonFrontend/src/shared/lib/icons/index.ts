@@ -1,3 +1,4 @@
+export { BellIcon } from './BellIcon';
 export { HomeIcon } from './HomeIcon';
 export { ProfileIcon } from './ProfileIcon';
 export { RatingIcon } from './RatingIcon';

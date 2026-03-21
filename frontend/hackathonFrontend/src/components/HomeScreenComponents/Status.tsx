@@ -25,23 +25,40 @@ export const Status = () => {
     }
   };
 
+  // Минимальный прогресс: points / target
+  const progress = user?.volume_points
+    ? Math.min(user.volume_points / 300, 1) // 1000 — пример цели
+    : 30; // Заглушка на progressBar
+
   const Icon = StatusIcon;
 
   return (
     <View style={styles.container}>
       <View style={styles.statusContainer}>
         <Icon color={getStatusColor()} />
-        <View>
+        <View style={{ flex: 1 }}>
           <Text style={styles.statusText}>
             {status[0].toLocaleUpperCase() + status.slice(1)}
           </Text>
-          <Text>ProgressBar</Text>
+
+          <View style={styles.progressBackground}>
+            <View
+              style={[
+                styles.progressFill,
+                {
+                  width: `${progress}%`,
+                  backgroundColor: Colors.primaryGreenFourth,
+                },
+              ]}
+            />
+          </View>
         </View>
       </View>
+
       <View style={styles.textContainer}>
-        <Text
-          style={styles.text}
-        >{`До ${getNextStatus(status)} осталось ${user?.volume_points || user?.total_points} ${numberParser(0)}`}</Text>
+        <Text style={styles.text}>
+          {`До ${getNextStatus(status)} осталось ${user?.volume_points || user?.total_points} ${numberParser(0)}`}
+        </Text>
       </View>
     </View>
   );
@@ -49,8 +66,7 @@ export const Status = () => {
 
 const styles = StyleSheet.create({
   container: {
-    display: 'flex',
-    backgroundColor: Colors.primaryDark,
+    backgroundColor: Colors.black50,
     borderRadius: 20,
     padding: 20,
     gap: 20,
@@ -64,8 +80,20 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
   statusContainer: {
-    display: 'flex',
     flexDirection: 'row',
+    gap: 20,
+    alignItems: 'center',
   },
   textContainer: {},
+  progressBackground: {
+    height: 10,
+    backgroundColor: Colors.primaryGrey,
+    borderRadius: 5,
+    marginTop: 10,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 5,
+  },
 });
