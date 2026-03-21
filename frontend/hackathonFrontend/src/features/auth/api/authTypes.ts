@@ -17,13 +17,14 @@ export interface User {
   registration_date: string; // ISO 8601 format
   sber_id: string;
   total_points: number;
+  points_to_next_status: number;
   volume_points: number;
   deals_points: number;
   share_points: number;
   total_deals: number;
   total_volume: string; // Строковое представление числа
   bank_share: number;
-  is_blocked: boolean;
+  conversation_points: number;
 }
 
 export interface AuthResponse {

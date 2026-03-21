@@ -9,9 +9,12 @@ import { StatusIcon } from 'src/shared/lib/icons';
 export const Status = () => {
   const { user } = useAuth();
   const [status, setStatus] = useState<UserStatus>('silver');
+  const [pointsNeeded, setPointsNeeded] = useState<number>(0);
 
   useEffect(() => {
     if (user?.status) setStatus(user.status);
+    if (user?.points_to_next_status)
+      setPointsNeeded(user.points_to_next_status);
   }, [user]);
 
   const getStatusColor = () => {
@@ -57,7 +60,9 @@ export const Status = () => {
 
       <View style={styles.textContainer}>
         <Text style={styles.text}>
-          {`До ${getNextStatus(status)} осталось ${user?.volume_points || user?.total_points} ${numberParser(0)}`}
+          {status !== 'platinum'
+            ? `До ${getNextStatus(status)} осталось ${pointsNeeded} ${numberParser(pointsNeeded)}`
+            : `Вы достигли максимального уровня`}
         </Text>
       </View>
     </View>

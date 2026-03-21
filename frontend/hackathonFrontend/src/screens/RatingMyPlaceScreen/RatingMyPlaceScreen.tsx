@@ -27,7 +27,7 @@ export default function RatingMyPlaceScreen() {
             onPress={() => router.back()}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
           >
-            <Text style={styles.back}>← Назад</Text>
+            <Text style={styles.back}>Назад</Text>
           </TouchableOpacity>
         </View>
         <Text style={styles.screenTitle}>Мое место в компании</Text>
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   },
   back: {
     color: Colors.primaryGreenFourth,
-    fontSize: 17,
+    fontSize: 20,
     fontWeight: '600',
   },
   screenTitle: {

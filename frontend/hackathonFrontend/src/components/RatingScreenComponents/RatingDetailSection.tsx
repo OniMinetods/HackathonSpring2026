@@ -14,7 +14,8 @@ const COPY = {
   deals: {
     howCalculated:
       'Учитывается количество оформленных сделок с продуктами банка за период.',
-    howToIncrease: 'Закрывайте больше сделок и подключайте к ним наши продукты.',
+    howToIncrease:
+      'Закрывайте больше сделок и подключайте к ним наши продукты.',
   },
   share: {
     howCalculated:
@@ -27,9 +28,9 @@ const COPY = {
 export const RatingDetailSection = () => {
   const { user } = useAuth();
 
-  const volumePts = user?.volume_points ?? 32;
-  const dealsPts = user?.deals_points ?? 18;
-  const sharePts = user?.share_points ?? 12;
+  const volumePts = user?.volume_points ?? 0;
+  const dealsPts = user?.deals_points ?? 0;
+  const sharePts = user?.share_points ?? 0;
 
   return (
     <View style={styles.wrap}>
