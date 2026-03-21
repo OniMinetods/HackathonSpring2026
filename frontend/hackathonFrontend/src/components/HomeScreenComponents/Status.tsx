@@ -4,6 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { UserStatus } from 'src/features/auth/api/authTypes';
 import { useAuth } from 'src/features/auth/hooks/useAuth';
 import { getNextStatus, numberParser } from 'src/shared/functions';
+import { getStatusColor } from 'src/shared/functions/getStatusColor';
 import { StatusIcon } from 'src/shared/lib/icons';
 
 export const Status = () => {
@@ -17,17 +18,6 @@ export const Status = () => {
       setPointsNeeded(user.points_to_next_status);
   }, [user]);
 
-  const getStatusColor = () => {
-    switch (status) {
-      case 'silver':
-        return Colors.silver;
-      case 'gold':
-        return Colors.gold;
-      case 'platinum':
-        return Colors.platinum;
-    }
-  };
-
   // Минимальный прогресс: points / target
   const progress = user?.volume_points
     ? Math.min(user.volume_points / 300, 1) // 1000 — пример цели
@@ -38,7 +28,7 @@ export const Status = () => {
   return (
     <View style={styles.container}>
       <View style={styles.statusContainer}>
-        <Icon color={getStatusColor()} />
+        <Icon color={getStatusColor(status)} />
         <View style={styles.statusTextCol}>
           <Text style={styles.statusText}>
             {status[0].toLocaleUpperCase() + status.slice(1)}
