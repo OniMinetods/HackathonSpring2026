@@ -11,12 +11,14 @@ User = get_user_model()
 
 
 class LevelSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели Level."""
     class Meta:
         model = Level
         fields = '__all__'
 
 
 class PrivilegeSerializer(serializers.ModelSerializer):
+    """Сериализатор для Privilege с добавлением названия уровня."""
     level_name = serializers.CharField(source='level.name', read_only=True)
 
     class Meta:
@@ -25,6 +27,7 @@ class PrivilegeSerializer(serializers.ModelSerializer):
 
 
 class DealSerializer(serializers.ModelSerializer):
+    """Сериализатор для Deal. Поля user и date только для чтения."""
     class Meta:
         model = Deal
         fields = '__all__'
@@ -32,6 +35,7 @@ class DealSerializer(serializers.ModelSerializer):
 
 
 class DailyResultSerializer(serializers.ModelSerializer):
+    """Сериализатор для DailyResult. Поля user и date только для чтения."""
     class Meta:
         model = DailyResult
         fields = '__all__'
@@ -39,12 +43,14 @@ class DailyResultSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    """Сериализатор для Task."""
     class Meta:
         model = Task
         fields = '__all__'
 
 
 class UserTaskSerializer(serializers.ModelSerializer):
+    """Сериализатор для UserTask с дополнительными полями из связанной задачи и процентом выполнения."""
     task_title = serializers.CharField(source='task.title', read_only=True)
     task_type = serializers.CharField(source='task.task_type', read_only=True)
     target_value = serializers.FloatField(source='task.target_value', read_only=True)
@@ -58,6 +64,7 @@ class UserTaskSerializer(serializers.ModelSerializer):
 
 
 class RatingSerializer(serializers.ModelSerializer):
+    """Сериализатор для Rating с добавлением имени пользователя и его уровня."""
     user_name = serializers.CharField(source='user.get_full_name', read_only=True)
     user_level = serializers.CharField(source='user.level', read_only=True)
 
@@ -67,12 +74,14 @@ class RatingSerializer(serializers.ModelSerializer):
 
 
 class NewsSerializer(serializers.ModelSerializer):
+    """Сериализатор для News."""
     class Meta:
         model = News
         fields = '__all__'
 
 
 class TrainingModuleSerializer(serializers.ModelSerializer):
+    """Сериализатор для TrainingModule с вычисляемыми полями is_completed и user_score."""
     is_completed = serializers.SerializerMethodField()
     user_score = serializers.SerializerMethodField()
 
@@ -81,6 +90,7 @@ class TrainingModuleSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_is_completed(self, obj):
+        """Возвращает, пройден ли модуль текущим пользователем."""
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             return UserTraining.objects.filter(
@@ -89,6 +99,7 @@ class TrainingModuleSerializer(serializers.ModelSerializer):
         return False
 
     def get_user_score(self, obj):
+        """Возвращает результат теста пользователя для модуля, если есть."""
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             training = UserTraining.objects.filter(
@@ -99,17 +110,20 @@ class TrainingModuleSerializer(serializers.ModelSerializer):
 
 
 class TrainingTestSerializer(serializers.ModelSerializer):
+    """Сериализатор для TrainingTest. Скрывает правильный ответ."""
     class Meta:
         model = TrainingTest
         fields = ['id', 'module', 'question']
 
 
 class TrainingCompleteSerializer(serializers.Serializer):
+    """Сериализатор для данных, отправляемых при завершении модуля."""
     module_id = serializers.IntegerField()
     answers = serializers.DictField(child=serializers.CharField())
 
 
 class UserTrainingSerializer(serializers.ModelSerializer):
+    """Сериализатор для UserTraining с добавлением названия модуля и баллов за прохождение."""
     module_title = serializers.CharField(source='module.title', read_only=True)
     module_reward_points = serializers.FloatField(source='module.reward_points', read_only=True)
 
@@ -120,6 +134,7 @@ class UserTrainingSerializer(serializers.ModelSerializer):
 
 
 class SupportTicketSerializer(serializers.ModelSerializer):
+    """Сериализатор для SupportTicket с добавлением имени пользователя и последнего сообщения."""
     user_name = serializers.CharField(source='user.get_full_name', read_only=True)
     last_message = serializers.SerializerMethodField()
 
@@ -129,6 +144,7 @@ class SupportTicketSerializer(serializers.ModelSerializer):
         read_only_fields = ['user', 'status', 'created_at', 'updated_at', 'admin_response']
 
     def get_last_message(self, obj):
+        """Возвращает последнее сообщение в тикете."""
         last_msg = obj.messages.last()
         if last_msg:
             return {
@@ -140,6 +156,7 @@ class SupportTicketSerializer(serializers.ModelSerializer):
 
 
 class SupportMessageSerializer(serializers.ModelSerializer):
+    """Сериализатор для SupportMessage с добавлением имени автора."""
     author_name = serializers.CharField(source='author.get_full_name', read_only=True)
 
     class Meta:
@@ -149,6 +166,7 @@ class SupportMessageSerializer(serializers.ModelSerializer):
 
 
 class BonusSerializer(serializers.ModelSerializer):
+    """Сериализатор для Bonus. Поля user и created_at только для чтения."""
     class Meta:
         model = Bonus
         fields = '__all__'
@@ -156,6 +174,7 @@ class BonusSerializer(serializers.ModelSerializer):
 
 
 class DashboardSerializer(serializers.Serializer):
+    """Составной сериализатор для дашборда пользователя."""
     user = serializers.SerializerMethodField()
     current_level = LevelSerializer()
     next_level = LevelSerializer(allow_null=True)
@@ -166,11 +185,13 @@ class DashboardSerializer(serializers.Serializer):
     points_breakdown = serializers.DictField()
 
     def get_user(self, obj):
+        """Сериализует данные пользователя через UserSerializer из apps.users."""
         from apps.users.serializers import UserSerializer
         return UserSerializer(obj).data
 
 
 class FinancialEffectSerializer(serializers.Serializer):
+    """Сериализатор для финансового эффекта."""
     total_bonuses = serializers.DecimalField(max_digits=12, decimal_places=2)
     level_benefit = serializers.DecimalField(max_digits=12, decimal_places=2)
     mortgage_savings = serializers.DecimalField(max_digits=12, decimal_places=2)
@@ -181,6 +202,7 @@ class FinancialEffectSerializer(serializers.Serializer):
 
 
 class RatingTopSerializer(serializers.Serializer):
+    """Сериализатор для топов рейтинга."""
     dealer_top = serializers.ListField()
     dealer_rank = serializers.IntegerField(allow_null=True)
     region_top = serializers.ListField()
@@ -190,6 +212,7 @@ class RatingTopSerializer(serializers.Serializer):
 
 
 class CalculatorRequestSerializer(serializers.Serializer):
+    """Валидация входных данных калькулятора."""
     additional_deals = serializers.IntegerField(min_value=0, default=0)
     additional_volume = serializers.FloatField(min_value=0, default=0)
     additional_share = serializers.FloatField(min_value=0, default=0)
@@ -197,6 +220,7 @@ class CalculatorRequestSerializer(serializers.Serializer):
 
 
 class CalculatorResponseSerializer(serializers.Serializer):
+    """Сериализатор ответа калькулятора."""
     new_total_points = serializers.FloatField()
     new_level = LevelSerializer(allow_null=True)
     financial_effect = serializers.DecimalField(max_digits=12, decimal_places=2)
