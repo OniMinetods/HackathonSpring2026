@@ -6,10 +6,5 @@ interface ProvidersProps {
 }
 
 export function Providers({ children }: ProvidersProps) {
-  return (
-    <SafeAreaProvider>
-      {/* Add other providers here */}
-      {children}
-    </SafeAreaProvider>
-  );
+  return <SafeAreaProvider>{children}</SafeAreaProvider>;
 }
