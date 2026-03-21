@@ -11,9 +11,11 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'username', 'first_name', 'last_name', 'patronymic', 'full_name',
             'email', 'phone', 'dealer_code', 'position', 'level',
-            'registration_date', 'sber_id', 'total_points', 'volume_points',
-            'deals_points', 'share_points', 'total_deals', 'total_volume',
-            'bank_share', 'is_blocked'
+            'registration_date', 'sber_id', 'total_points',
+            'volume_of_transactions', 'number_of_transactions', 'bank_share', 'conversion_rate',
+            'volume_of_transactions_plan', 'number_of_transactions_plan',
+            'bank_share_plan', 'conversion_rate_plan',
+            'is_blocked', 'block_reason'
         ]
         read_only_fields = ['id', 'registration_date', 'total_points']
 

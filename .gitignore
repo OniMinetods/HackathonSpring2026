@@ -1,157 +1,42 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-pythonenv*
+/.idea
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
-# Django
-*.log
-*.pot
-*.pyc
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-media/
-staticfiles/
-static_collected/
-*.sqlite3
+# dependencies
+node_modules/
 
-# Virtual Environment
-.venv/
-venv/
-ENV/
-.env
-.venv
-venv
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-*.sublime-project
-*.sublime-workspace
-.settings/
-.project
-.pydevproject
-
-# Testing
-.coverage
-htmlcov/
-.tox/
-.pytest_cache/
-.coverage.*
-.coverage
-.coverage.*
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-.pytest_cache/
-cover/
-
-# Environments
-.env
-.venv
-venv/
-env/
-environ/
-.envrc
-
-# Package management
-pip-log.txt
-pip-delete-this-directory.txt
-pip-selfcheck.json
-.pip-cache/
-.python-version
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
+# Expo
+.expo/
 dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+web-build/
+expo-env.d.ts
 
-# PyInstaller
-*.manifest
-*.spec
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
 
-# Logs
-*.log
-logs/
-log/
-*.pid
+# Metro
+.metro-health-check*
 
-# Database
-*.db
-*.sqlite
-*.sqlite3
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
 
-# Django migrations
-*/migrations/*.py
-!*/migrations/__init__.py
+# macOS
+.DS_Store
+*.pem
 
-# Static files
-staticfiles/
-static_collected/
-media/
-static_root/
+# local env files
+.env*.local
 
-# Celery
-celerybeat-schedule
-celerybeat.pid
-celerybeat-schedule.db
+# typescript
+*.tsbuildinfo
 
-# Sphinx documentation
-docs/_build/
-docs/_autosummary/
-
-# pyenv
-.python-version
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
-
-# Backup files
-*.bak
-*.backup
-*.tmp
-
-# Project specific
-.env.local
-.env.production
-.env.staging
-
-# Debug
-debug.log
-debug.log.*
-
-# Session files
-*.session
-sessions/
+# generated native folders
+/ios
+/android
