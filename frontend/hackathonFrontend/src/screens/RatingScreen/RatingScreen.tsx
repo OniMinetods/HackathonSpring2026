@@ -1,7 +1,5 @@
-import { CalculatorEntryButton } from '@components/CalculatorScreenComponents/CalculatorEntryButton';
-import { RatingDealerTop } from '@components/RatingScreenComponents/RatingDealerTop';
-import { RatingMyRank } from '@components/RatingScreenComponents/RatingMyRank';
-import { RatingRegionTop } from '@components/RatingScreenComponents/RatingRegionTop';
+import { GreenStackButton } from '@components/GreenStackButton';
+import { RatingDetailSection } from '@components/RatingScreenComponents/RatingDetailSection';
 import { Colors } from '@constants/colors';
 import {
   ImageBackground,
@@ -34,10 +32,11 @@ export default function RatingScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <RatingMyRank />
-          <CalculatorEntryButton title="Смоделировать рост" />
-          <RatingDealerTop />
-          <RatingRegionTop />
+          <RatingDetailSection />
+          <GreenStackButton
+            title="Мое место в компании"
+            href="/rating-my-place"
+          />
         </ScrollView>
       </View>
     </ImageBackground>

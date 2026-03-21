@@ -15,6 +15,7 @@ function RootNavigator() {
         <View>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="calculator" />
+          <Stack.Screen name="rating-my-place" />
         </View>
       ) : (
         <Stack.Screen name="login" />
