@@ -1,9 +1,10 @@
 import { CalculatorCurrentStatus } from '@components/CalculatorScreenComponents/CalculatorCurrentStatus';
 import { ScenarioOutcomeCard } from '@components/CalculatorScreenComponents/ScenarioOutcomeCard';
 import { ScenarioSlider } from '@components/CalculatorScreenComponents/ScenarioSlider';
+import { API_ROUTES } from '@constants/API_ROUTES';
 import { Colors } from '@constants/colors';
 import { useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ImageBackground,
   ScrollView,
@@ -12,9 +13,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import type { UserStatus } from 'src/features/auth/api/authTypes';
+import { UserStatus } from 'src/features/auth/api/authTypes';
 import { useAuth } from 'src/features/auth/hooks/useAuth';
 import { computeScenario } from 'src/features/calculator/lib/scenarioModel';
+import { useDebounce } from '../hooks/useDebounce';
 
 const MAX_DEALS = 15;
 const MAX_VOLUME_MILLION = 30;
@@ -25,12 +27,60 @@ export default function CalculatorForm() {
   const router = useRouter();
   const { user } = useAuth();
   const basePoints = user?.total_points ?? 0;
-  const currentStatus = (user?.status ?? 'silver') as UserStatus;
+  const [currentStatus, setCurrentStatus] = useState<UserStatus>('silver');
+
+  useEffect(() => {
+    if (user) {
+      setCurrentStatus(user.status);
+    }
+  }, [user]);
 
   const [extraDeals, setExtraDeals] = useState(0);
   const [extraVolumeMillion, setExtraVolumeMillion] = useState(0);
   const [extraShareSteps, setExtraShareSteps] = useState(0);
   const [extraProducts, setExtraProducts] = useState(0);
+
+  const debouncedDeals = useDebounce(extraDeals, 500);
+  const debouncedVolume = useDebounce(extraVolumeMillion, 500);
+  const debouncedShareSteps = useDebounce(extraShareSteps, 500);
+  const debouncedProducts = useDebounce(extraProducts, 500);
+
+  useEffect(() => {
+    // Отправляем только когда debounced значения стабилизировались
+    const sendData = async () => {
+      console.log('Отправка на API:', {
+        extraDeals: debouncedDeals,
+        extraVolumeMillion: debouncedVolume,
+        extraShareSteps: debouncedShareSteps,
+        extraProducts: debouncedProducts,
+      });
+
+      try {
+        const response = await fetch(`${API_ROUTES}/users/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            extraDeals: debouncedDeals,
+            extraVolumeMillion: debouncedVolume,
+            extraShareSteps: debouncedShareSteps,
+            extraProducts: debouncedProducts,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Ошибка отправки');
+        }
+
+        console.log('Данные успешно отправлены');
+      } catch (error) {
+        console.error('Ошибка:', error);
+      }
+    };
+
+    sendData();
+  }, [debouncedDeals, debouncedVolume, debouncedShareSteps, debouncedProducts]);
 
   const outcome = useMemo(
     () =>

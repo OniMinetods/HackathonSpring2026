@@ -1,6 +1,7 @@
 import { Colors } from '@constants/colors';
+import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { UserStatus } from 'src/features/auth/api/authTypes';
 import { useAuth } from 'src/features/auth/hooks/useAuth';
 import { getNextStatus, numberParser } from 'src/shared/functions';
@@ -8,6 +9,7 @@ import { getStatusColor } from 'src/shared/functions/getStatusColor';
 import { StatusIcon } from 'src/shared/lib/icons';
 
 export const Status = () => {
+  const router = useRouter();
   const { user } = useAuth();
   const [status, setStatus] = useState<UserStatus>('silver');
   const [pointsNeeded, setPointsNeeded] = useState<number>(0);
@@ -26,7 +28,10 @@ export const Status = () => {
   const Icon = StatusIcon;
 
   return (
-    <View style={styles.container}>
+    <Pressable
+      onPress={() => router.push('/privileges')}
+      style={({ pressed }) => [styles.container, pressed && styles.pressed]}
+    >
       <View style={styles.statusContainer}>
         <Icon color={getStatusColor(status)} />
         <View style={styles.statusTextCol}>
@@ -55,7 +60,7 @@ export const Status = () => {
             : `Вы достигли максимального уровня`}
         </Text>
       </View>
-    </View>
+    </Pressable>
   );
 };
 
@@ -65,6 +70,9 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     gap: 16,
+  },
+  pressed: {
+    opacity: 0.92,
   },
   statusTextCol: {
     flex: 1,

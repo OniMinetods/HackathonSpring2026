@@ -23,7 +23,7 @@ export const GreenStackButton = ({ title, href }: GreenStackButtonProps) => {
 
 const styles = StyleSheet.create({
   btn: {
-    borderRadius: 20,
+    borderRadius: 8,
     paddingVertical: 18,
     paddingHorizontal: 20,
     backgroundColor: Colors.primaryGreenFirst,

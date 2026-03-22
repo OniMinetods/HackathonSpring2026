@@ -1,4 +1,3 @@
-import { CalculatorEntryButton } from '@components/CalculatorScreenComponents/CalculatorEntryButton';
 import { ProfileIdentity } from '@components/ProfileScreenComponents/ProfileIdentity';
 import { ProfileInfoCard } from '@components/ProfileScreenComponents/ProfileInfoCard';
 import { ProfileProgramCard } from '@components/ProfileScreenComponents/ProfileProgramCard';
@@ -37,7 +36,6 @@ export default function ProfileScreen() {
           <ProfileIdentity />
           <ProfileInfoCard />
           <ProfileProgramCard />
-          <CalculatorEntryButton title="Рассчитать новый статус" />
         </ScrollView>
       </View>
     </ImageBackground>

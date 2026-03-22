@@ -24,7 +24,7 @@ export function tierLabelForPdf(status: UserStatus): string {
     case 'gold':
       return 'Gold';
     case 'platinum':
-      return 'Black';
+      return 'Platinum';
   }
 }
 
@@ -58,7 +58,10 @@ export function computeScenario(
   const projectedPoints = safeBase + delta;
   const projectedStatus = statusFromTotalPoints(projectedPoints);
 
-  const yearlyIncomeRub = estimateYearlyIncome(projectedPoints, projectedStatus);
+  const yearlyIncomeRub = estimateYearlyIncome(
+    projectedPoints,
+    projectedStatus,
+  );
   const mortgageSavingsRub = estimateMortgageSavings(
     projectedPoints,
     projectedStatus,
