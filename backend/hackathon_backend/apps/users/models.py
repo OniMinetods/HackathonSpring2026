@@ -75,10 +75,10 @@ class User(AbstractUser):
     @property
     def total_points(self):
         """Возвращает общий балл и все компоненты."""
-        vol_part = min(120, self._safe_divide(
+        vol_part = self._safe_divide(
             self.volume_of_transactions,
             self.volume_of_transactions_plan
-        )) * 0.35
+        ) * 0.35
 
         deals_part = self._safe_divide(
             self.number_of_transactions,
