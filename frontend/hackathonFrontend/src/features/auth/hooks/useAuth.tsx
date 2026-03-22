@@ -1,6 +1,12 @@
 // features/auth/hooks/useAuth.ts
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { AuthApi } from '../api/authApi';
 import type { AuthResponse, LoginRequest, User } from '../api/authTypes';
 
@@ -11,6 +17,7 @@ interface AuthContextType {
   error: string | null;
   login: (data: LoginRequest) => Promise<void>;
   logout: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -74,9 +81,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await AsyncStorage.removeItem(USER_KEY);
   };
 
+  const refreshProfile = useCallback(async () => {
+    if (!token?.trim()) {
+      return;
+    }
+    try {
+      const u = await AuthApi.getProfile(token);
+      setUser(u);
+      await AsyncStorage.setItem(USER_KEY, JSON.stringify(u));
+    } catch (e) {
+      console.log('refreshProfile', e);
+    }
+  }, [token]);
+
   return (
     <AuthContext.Provider
-      value={{ user, token, isLoading, error, login, logout }}
+      value={{ user, token, isLoading, error, login, logout, refreshProfile }}
     >
       {children}
     </AuthContext.Provider>

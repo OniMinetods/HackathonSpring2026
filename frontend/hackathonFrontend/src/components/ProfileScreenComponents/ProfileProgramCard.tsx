@@ -17,7 +17,14 @@ export const ProfileProgramCard = () => {
       setDateJoined(user.date_joined);
       setStatus(user?.status);
     }
-  });
+  }, [user]);
+
+  const monthsInCurrentTier =
+    status === 'silver'
+      ? (user?.months_silver_current_year ?? 0)
+      : status === 'gold'
+        ? (user?.months_gold_current_year ?? 0)
+        : (user?.months_platinum_current_year ?? 0);
 
   return (
     <View style={styles.card}>
@@ -32,6 +39,11 @@ export const ProfileProgramCard = () => {
         >
           {status[0].toLocaleUpperCase() + status.slice(1)}
         </Text>
+      </View>
+      <View style={styles.divider} />
+      <View style={styles.row}>
+        <Text style={styles.label}>Месяцев в текущем статусе (год)</Text>
+        <Text style={styles.value}>{monthsInCurrentTier}</Text>
       </View>
       <View style={styles.divider} />
       <View style={styles.row}>

@@ -18,6 +18,7 @@ function RootNavigator() {
           <Stack.Screen name="rating-my-place" />
           <Stack.Screen name="privileges" />
           <Stack.Screen name="privilege-detail" />
+          <Stack.Screen name="financial-effect" />
         </View>
       ) : (
         <Stack.Screen name="login" />

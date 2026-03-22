@@ -2,10 +2,15 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+import logging
+
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from .models import User
+from .monthly import apply_monthly_status_credits
 from .serializers import UserSerializer, UserProfileUpdateSerializer
+
+logger = logging.getLogger(__name__)
 
 
 class UserViewSet(viewsets.GenericViewSet):
@@ -46,6 +51,11 @@ class LoginViewSet(viewsets.ViewSet):
         user = authenticate(username=username, password=password)
         if user:
             token, created = Token.objects.get_or_create(user=user)
+            try:
+                apply_monthly_status_credits(user.pk)
+                user.refresh_from_db()
+            except Exception:
+                logger.exception('apply_monthly_status_credits on login failed')
             return Response({
                 'token': token.key,
                 'user': UserSerializer(user).data

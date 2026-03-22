@@ -5,7 +5,6 @@ from .views import PrivilegeListView, ScenarioCalculatorView
 router = DefaultRouter()
 
 urlpatterns = [
-    path('', include(router.urls)),
     path('privileges/', PrivilegeListView.as_view(), name='privilege-list'),
     path(
         'scenario-calculator/',

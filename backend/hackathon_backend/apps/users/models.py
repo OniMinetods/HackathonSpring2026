@@ -55,6 +55,24 @@ class User(AbstractUser):
     months_silver_current_year = models.IntegerField('Месяцев в статусе Silver в текущем году', default=0)
     months_gold_current_year = models.IntegerField('Месяцев в статусе Gold в текущем году', default=0)
     months_platinum_current_year = models.IntegerField('Месяцев в статусе Platinum в текущем году', default=0)
+    months_year_tracker = models.IntegerField(
+        'Год, для которого ведутся счётчики месяцев', blank=True, null=True
+    )
+    last_monthly_credit_ym = models.CharField(
+        'Последний учтённый месяц (YYYY-MM)',
+        max_length=7,
+        blank=True,
+        null=True,
+    )
+
+    # bonus_income_yearly_rub = models.PositiveIntegerField(
+    #     'Доп. доход от бонусов за год (₽)', default=0
+    # )
+    # mortgage_savings_yearly_rub = models.PositiveIntegerField(
+    #     'Экономия по ипотеке за год (₽)', default=0
+    # )
+    # cashback_yearly_rub = models.PositiveIntegerField('Кэшбэк за год (₽)', default=0)
+    # dms_yearly_rub = models.PositiveIntegerField('ДМС стоимость за год (₽)', default=0)
 
     class Meta:
         verbose_name = 'Пользователь'

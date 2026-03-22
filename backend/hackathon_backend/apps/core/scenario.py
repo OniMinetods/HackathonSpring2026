@@ -58,7 +58,7 @@ def status_from_points(points: float) -> str:
 
 def tier_display(status: str) -> str:
     if status == 'platinum':
-        return 'Black'
+        return 'Platinum'
     return status.capitalize()
 
 

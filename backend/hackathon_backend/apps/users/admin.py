@@ -25,9 +25,16 @@ class CustomUserAdmin(UserAdmin):
                 'volume_of_transactions', 'number_of_transactions', 'bank_share',
                 'conversion_rate', 'volume_points', 'deals_points', 'share_points',
                 'conversion_points', 'total_points',
-                'months_silver_current_year', 'months_gold_current_year', 'months_platinum_current_year'
+                'months_silver_current_year', 'months_gold_current_year',
+                'months_platinum_current_year', 'months_year_tracker', 'last_monthly_credit_ym',
             )
         }),
+        # (_('Личный финансовый эффект (год)'), {
+        #     'fields': (
+        #         'bonus_income_yearly_rub', 'mortgage_savings_yearly_rub',
+        #         'cashback_yearly_rub', 'dms_yearly_rub',
+        #     )
+        # }),
         (_('Плановые показатели'), {
             'fields': (
                 'volume_of_transactions_plan', 'number_of_transactions_plan',
@@ -39,4 +46,13 @@ class CustomUserAdmin(UserAdmin):
         # }),
     )
 
-    readonly_fields = ('date_joined', 'date_joined', 'total_points', 'volume_points', 'deals_points', 'share_points',  'conversion_points', 'months_silver_current_year', 'months_gold_current_year', 'months_platinum_current_year')
+    readonly_fields = (
+        'date_joined',
+        'total_points',
+        'volume_points',
+        'deals_points',
+        'share_points',
+        'conversion_points',
+        'months_year_tracker',
+        'last_monthly_credit_ym',
+    )
