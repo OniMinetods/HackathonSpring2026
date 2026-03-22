@@ -19,6 +19,8 @@ function RootNavigator() {
           <Stack.Screen name="privileges" />
           <Stack.Screen name="privilege-detail" />
           <Stack.Screen name="financial-effect" />
+          <Stack.Screen name="day-results" />
+          <Stack.Screen name="rating-detail" />
         </View>
       ) : (
         <Stack.Screen name="login" />

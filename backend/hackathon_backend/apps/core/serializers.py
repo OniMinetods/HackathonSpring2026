@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Privilege
+from .models import DailyResult, Privilege
 
 
 class PrivilegeSerializer(serializers.ModelSerializer):
@@ -27,3 +27,18 @@ class ScenarioCalculatorInputSerializer(serializers.Serializer):
 
     def validate_extra_volume_million(self, value):
         return round(float(value), 4)
+
+
+class DailyResultSerializer(serializers.ModelSerializer):
+    date = serializers.DateField(read_only=True)
+
+    class Meta:
+        model = DailyResult
+        fields = (
+            'date',
+            'deals_count',
+            'credit_volume_million',
+            'extra_products_count',
+            'updated_at',
+        )
+        read_only_fields = ('updated_at',)

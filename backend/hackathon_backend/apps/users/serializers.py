@@ -14,10 +14,10 @@ class UserSerializer(serializers.ModelSerializer):
             'id',
             'date_joined',
             'total_points',
-            'bonus_income_yearly_rub',
-            'mortgage_savings_yearly_rub',
-            'cashback_yearly_rub',
-            'dms_yearly_rub',
+            #'bonus_income_yearly_rub',
+            #'mortgage_savings_yearly_rub',
+            #'cashback_yearly_rub',
+            #'dms_yearly_rub',
             'months_silver_current_year',
             'months_gold_current_year',
             'months_platinum_current_year',
@@ -25,15 +25,15 @@ class UserSerializer(serializers.ModelSerializer):
             'last_monthly_credit_ym',
         ]
 
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data['total_financial_benefit_yearly_rub'] = (
-            int(instance.bonus_income_yearly_rub)
-            + int(instance.mortgage_savings_yearly_rub)
-            + int(instance.cashback_yearly_rub)
-            + int(instance.dms_yearly_rub)
-        )
-        return data
+    # def to_representation(self, instance):
+    #     data = super().to_representation(instance)
+    #     data['total_financial_benefit_yearly_rub'] = (
+    #         int(instance.bonus_income_yearly_rub)
+    #         + int(instance.mortgage_savings_yearly_rub)
+    #         + int(instance.cashback_yearly_rub)
+    #         + int(instance.dms_yearly_rub)
+    #     )
+    #     return data
 
     def get_full_name(self, obj):
         if obj.patronymic:

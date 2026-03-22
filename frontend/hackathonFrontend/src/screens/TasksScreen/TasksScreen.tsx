@@ -1,5 +1,6 @@
 import { TaskMonthItem } from '@components/TasksScreenComponents/TaskMonthItem';
 import { Colors } from '@constants/colors';
+import { useRouter } from 'expo-router';
 import {
   ImageBackground,
   ScrollView,
@@ -12,6 +13,7 @@ import { BellIcon } from 'src/shared/lib/icons';
 
 export default function TasksScreen() {
   const Icon = BellIcon;
+  const router = useRouter();
 
   return (
     <ImageBackground
@@ -54,6 +56,16 @@ export default function TasksScreen() {
             reward="Награда: +3 балла"
           />
         </ScrollView>
+        <TouchableOpacity
+          style={styles.dayResultsBtn}
+          onPress={() => router.push('/day-results')}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.dayResultsTitle}>Результаты дня</Text>
+          <Text style={styles.dayResultsSub}>
+            Внести сделки, объём и доп. продукты за сегодня
+          </Text>
+        </TouchableOpacity>
       </View>
     </ImageBackground>
   );
@@ -90,7 +102,27 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 24,
+    paddingBottom: 12,
     gap: 12,
+  },
+  dayResultsBtn: {
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    backgroundColor: Colors.primaryDark,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    marginBottom: 16,
+  },
+  dayResultsTitle: {
+    color: Colors.white,
+    fontSize: 17,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  dayResultsSub: {
+    color: Colors.primaryGrey,
+    fontSize: 14,
+    lineHeight: 20,
   },
 });

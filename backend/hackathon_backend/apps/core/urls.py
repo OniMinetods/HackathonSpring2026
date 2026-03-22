@@ -1,8 +1,9 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import PrivilegeListView, ScenarioCalculatorView
-
-router = DefaultRouter()
+from django.urls import path
+from .views import (
+    DailyResultTodayView,
+    PrivilegeListView,
+    ScenarioCalculatorView,
+)
 
 urlpatterns = [
     path('privileges/', PrivilegeListView.as_view(), name='privilege-list'),
@@ -10,5 +11,10 @@ urlpatterns = [
         'scenario-calculator/',
         ScenarioCalculatorView.as_view(),
         name='scenario-calculator',
+    ),
+    path(
+        'daily-result/today/',
+        DailyResultTodayView.as_view(),
+        name='daily-result-today',
     ),
 ]
