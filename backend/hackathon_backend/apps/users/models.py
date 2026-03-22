@@ -202,7 +202,7 @@ class User(AbstractUser):
     def monthly_status_update(self, check_date=None):
         """
         Выполняет ежемесячное обновление статуса пользователя.
-        Если check_date не указан, используется текущая дата.
+        Обновление происходит при переходе в следующий календарный месяц.
         """
         if check_date is None:
             now = timezone.now().date()
@@ -212,7 +212,6 @@ class User(AbstractUser):
             else:
                 now = check_date
 
-        # Если дата последнего обновления не установлена, используем дату регистрации
         if self.last_status_update is None:
             if hasattr(self, 'date_joined') and self.date_joined:
                 if hasattr(self.date_joined, 'date'):
@@ -227,41 +226,48 @@ class User(AbstractUser):
             last_date = last_date.date()
 
         if last_date > now:
-            return  # некорректные даты
+            return
 
-        # Проверяем, прошёл ли хотя бы один полный календарный месяц
-        months_passed = self._months_between(last_date, now)
-        if months_passed == 0:
-            return  # обновление ещё не требуется
+        if last_date.month == 12:
+            next_month_first = date(last_date.year + 1, 1, 1)
+        else:
+            next_month_first = date(last_date.year, last_date.month + 1, 1)
 
-        # Добавляем месяцы, проведённые в текущем статусе за прошедший период
+        if now < next_month_first:
+            return
+
+        months_passed = self._calculate_months_passed(last_date, now)
+
         self._add_months_for_period(last_date, now, self.status)
 
-        # Пересчитываем статус на основе текущих баллов
         new_status = self.current_status
         if new_status != self.status:
             self.status = new_status
 
-        # Обновляем дату последнего обновления
         self.last_status_update = now
+
         self.save(update_fields=[
             'status', 'last_status_update',
             'months_silver_current_year', 'months_gold_current_year', 'months_platinum_current_year'
         ])
 
-    def reset_yearly_status_months(self):
+    def _calculate_months_passed(self, start_date, end_date):
         """
-        Сбрасывает счетчики месяцев для нового года.
-        Эту функцию нужно вызывать в начале каждого года (например, 1 января).
+        Рассчитывает количество полных месяцев между двумя датами.
+        Учитывает переход через границу месяца.
         """
-        self.months_silver_current_year = 0
-        self.months_gold_current_year = 0
-        self.months_platinum_current_year = 0
-        self.save(update_fields=[
-            'months_silver_current_year',
-            'months_gold_current_year',
-            'months_platinum_current_year'
-        ])
+        months = (end_date.year - start_date.year) * 12 + (end_date.month - start_date.month)
+
+        if start_date.month == 12:
+            next_month_first = date(start_date.year + 1, 1, 1)
+        else:
+            next_month_first = date(start_date.year, start_date.month + 1, 1)
+
+        if end_date < next_month_first:
+            return 0
+
+        return max(1, months)
+
 
     def save(self, *args, **kwargs):
         """

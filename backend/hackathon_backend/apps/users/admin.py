@@ -39,4 +39,4 @@ class CustomUserAdmin(UserAdmin):
         # }),
     )
 
-    readonly_fields = ('date_joined', 'date_joined', 'total_points', 'volume_points', 'deals_points', 'share_points',  'conversion_points')
+    readonly_fields = ('date_joined', 'date_joined', 'total_points', 'volume_points', 'deals_points', 'share_points',  'conversion_points', 'months_silver_current_year', 'months_gold_current_year', 'months_platinum_current_year')
