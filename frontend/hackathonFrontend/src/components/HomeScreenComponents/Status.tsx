@@ -22,8 +22,8 @@ export const Status = () => {
 
   // Минимальный прогресс: points / target
   const progress = user?.volume_points
-    ? Math.min(user.volume_points / 300, 1) // 1000 — пример цели
-    : 30; // Заглушка на progressBar
+    ? Math.min((user.volume_points / 200) * 100, 1) // 1000 — пример цели
+    : 0; // Заглушка на progressBar
 
   const Icon = StatusIcon;
 
@@ -39,17 +39,19 @@ export const Status = () => {
             {status[0].toLocaleUpperCase() + status.slice(1)}
           </Text>
 
-          <View style={styles.progressBackground}>
-            <View
-              style={[
-                styles.progressFill,
-                {
-                  width: `${progress}%`,
-                  backgroundColor: Colors.primaryGreenFourth,
-                },
-              ]}
-            />
-          </View>
+          {status !== 'platinum' && (
+            <View style={styles.progressBackground}>
+              <View
+                style={[
+                  styles.progressFill,
+                  {
+                    width: `${progress}%`,
+                    backgroundColor: Colors.primaryGreenFourth,
+                  },
+                ]}
+              />
+            </View>
+          )}
         </View>
       </View>
 
