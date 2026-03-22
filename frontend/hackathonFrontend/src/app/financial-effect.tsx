@@ -1,7 +1,9 @@
 import { Colors } from '@constants/colors';
+import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
-import { useEffect } from 'react';
+import { useCallback, useState } from 'react';
 import {
+  ActivityIndicator,
   ImageBackground,
   ScrollView,
   StyleSheet,
@@ -15,20 +17,53 @@ function formatRub(n: number): string {
   return Math.round(n).toLocaleString('ru-RU');
 }
 
+/** DRF может отдать число или строку. */
+function num(v: unknown): number {
+  if (typeof v === 'number' && Number.isFinite(v)) {
+    return v;
+  }
+  if (typeof v === 'string' && v.trim() !== '') {
+    const parsed = parseFloat(v.replace(',', '.'));
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  return 0;
+}
+
 export default function FinancialEffectScreen() {
   const router = useRouter();
-  const { user, refreshProfile } = useAuth();
+  const { token, user, refreshProfile } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    void refreshProfile();
-  }, [refreshProfile]);
+  const load = useCallback(async () => {
+    if (!token?.trim()) {
+      setError('Войдите в аккаунт, чтобы загрузить данные.');
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    const u = await refreshProfile();
+    if (!u) {
+      setError('Не удалось загрузить данные профиля с сервера.');
+    } else {
+      setError(null);
+    }
+    setLoading(false);
+  }, [token, refreshProfile]);
 
-  const bonus = user?.bonus_income_yearly_rub ?? 0;
-  const mortgage = user?.mortgage_savings_yearly_rub ?? 0;
-  const cashback = user?.cashback_yearly_rub ?? 0;
-  const dms = user?.dms_yearly_rub ?? 0;
-  const total =
-    user?.total_financial_benefit_yearly_rub ?? bonus + mortgage + cashback + dms;
+  useFocusEffect(
+    useCallback(() => {
+      void load();
+    }, [load]),
+  );
+
+  const bonus = num(user?.bonus_income_yearly_rub);
+  const mortgage = num(user?.mortgage_savings_yearly_rub);
+  const cashback = num(user?.cashback_yearly_rub);
+  const dms = num(user?.dms_yearly_rub);
+  const sumParts = bonus + mortgage + cashback + dms;
+  const apiTotal = num(user?.total_financial_benefit_yearly_rub);
+  const total = apiTotal || sumParts;
 
   const year = new Date().getFullYear();
 
@@ -48,6 +83,15 @@ export default function FinancialEffectScreen() {
           </TouchableOpacity>
         </View>
         <Text style={styles.screenTitle}>Личный финансовый эффект</Text>
+        {error && !loading && (
+          <Text style={styles.errorBanner}>{error}</Text>
+        )}
+        {loading && (
+          <View style={styles.loadingRow}>
+            <ActivityIndicator color={Colors.primaryGreenFourth} />
+            <Text style={styles.loadingText}>Загрузка данных…</Text>
+          </View>
+        )}
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={styles.scrollContent}
@@ -131,6 +175,21 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
+  },
+  errorBanner: {
+    color: '#ff8a80',
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  loadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 12,
+  },
+  loadingText: {
+    color: Colors.primaryGrey,
+    fontSize: 15,
   },
   scroll: {
     flex: 1,
