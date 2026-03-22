@@ -1,7 +1,7 @@
 export const Colors = {
   // Основные цвета
   primaryGrey: '#757575',
-  primaryGreenFirst: '#237E38',
+  primaryGreenFirst: '#1c652dff',
   primaryGreenFourth: '#52C367',
   primaryDark: '#101012',
   black: '#000000',

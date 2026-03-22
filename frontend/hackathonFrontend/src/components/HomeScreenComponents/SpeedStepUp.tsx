@@ -16,7 +16,7 @@ export const SpeedStepUp = () => {
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 20,
+    borderRadius: 8,
     paddingVertical: 18,
     paddingHorizontal: 20,
     backgroundColor: Colors.primaryGreenFirst,

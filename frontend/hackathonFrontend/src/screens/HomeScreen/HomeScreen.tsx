@@ -1,5 +1,5 @@
 import { FinancialForecast } from '@components/HomeScreenComponents/FinancialForecast';
-import { NameLastname, SpeedStepUp, Status } from '@components/index';
+import { SpeedStepUp, Status } from '@components/index';
 import { Colors } from '@constants/colors';
 import { useRouter } from 'expo-router';
 // import { useRouter } from 'expo-router';
@@ -41,8 +41,6 @@ export default function HomeScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <NameLastname />
-          <Text style={styles.sectionLabel}>Текущий статус</Text>
           <Status />
           <FinancialForecast />
           <SpeedStepUp />
@@ -70,6 +68,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 100,
   },
   title: {
     fontSize: 24,

@@ -1,8 +1,8 @@
 import { Colors } from '@constants/colors';
+import { StyleSheet, Text, View } from 'react-native';
 import type { UserStatus } from 'src/features/auth/api/authTypes';
 import { tierLabelForPdf } from 'src/features/calculator/lib/scenarioModel';
 import { StatusIcon } from 'src/shared/lib/icons';
-import { StyleSheet, Text, View } from 'react-native';
 
 const statusColor = (s: UserStatus) => {
   switch (s) {
