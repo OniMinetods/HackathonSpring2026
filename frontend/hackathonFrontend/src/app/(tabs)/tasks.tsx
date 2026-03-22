@@ -1,2 +1,7 @@
+import { useRefreshProfileOnFocus } from 'src/features/auth/hooks/useRefreshProfileOnFocus';
 import TasksScreen from '../../screens/TasksScreen/TasksScreen';
-export default TasksScreen;
+
+export default function TasksTab() {
+  useRefreshProfileOnFocus();
+  return <TasksScreen />;
+}

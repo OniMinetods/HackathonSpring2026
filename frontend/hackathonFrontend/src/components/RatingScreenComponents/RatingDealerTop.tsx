@@ -1,34 +1,56 @@
 import { Colors } from '@constants/colors';
 import { StyleSheet, Text, View } from 'react-native';
+import type { DealerCenterTopRow } from 'src/features/rating/api/dealerCenterRatingTypes';
 
-const ROWS: { place: number; name: string; points: string }[] = [
-  { place: 1, name: 'Смирнов А.', points: '412' },
-  { place: 2, name: 'Козлова Е.', points: '398' },
-  { place: 3, name: 'Петров Д.', points: '385' },
-  { place: 4, name: 'Новикова М.', points: '371' },
-  { place: 5, name: 'Волков И.', points: '360' },
-  { place: 6, name: 'Орлова К.', points: '348' },
-  { place: 7, name: 'Иванов И.', points: '336' },
-  { place: 8, name: 'Соколов П.', points: '322' },
-  { place: 9, name: 'Лебедева А.', points: '310' },
-  { place: 10, name: 'Морозов С.', points: '298' },
-];
+export type RatingDealerTopProps = {
+  loading?: boolean;
+  rows: DealerCenterTopRow[];
+  currentUserId: number;
+  hasDealerCode: boolean;
+};
 
-export const RatingDealerTop = () => {
+function formatPoints(p: number): string {
+  return Number(p).toLocaleString('ru-RU', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  });
+}
+
+export const RatingDealerTop = ({
+  loading = false,
+  rows,
+  currentUserId,
+  hasDealerCode,
+}: RatingDealerTopProps) => {
   return (
     <View style={styles.card}>
       <Text style={styles.title}>Топ-10 внутри дилера</Text>
       <View style={styles.list}>
-        {ROWS.map((r) => (
-          <View
-            key={r.place}
-            style={[styles.row, r.place === 7 && styles.rowHighlight]}
-          >
-            <Text style={styles.place}>{r.place}</Text>
-            <Text style={styles.name}>{r.name}</Text>
-            <Text style={styles.points}>{r.points}</Text>
-          </View>
-        ))}
+        {loading && (
+          <Text style={styles.muted}>Загрузка…</Text>
+        )}
+        {!loading && !hasDealerCode && (
+          <Text style={styles.muted}>
+            Укажите код дилерского центра в профиле
+          </Text>
+        )}
+        {!loading && hasDealerCode && rows.length === 0 && (
+          <Text style={styles.muted}>Пока нет коллег в вашем ДЦ</Text>
+        )}
+        {!loading &&
+          rows.map((r) => (
+            <View
+              key={r.user_id}
+              style={[
+                styles.row,
+                r.user_id === currentUserId && styles.rowHighlight,
+              ]}
+            >
+              <Text style={styles.place}>{r.rank}</Text>
+              <Text style={styles.name}>{r.name}</Text>
+              <Text style={styles.points}>{formatPoints(r.total_points)}</Text>
+            </View>
+          ))}
       </View>
     </View>
   );
@@ -48,6 +70,11 @@ const styles = StyleSheet.create({
   },
   list: {
     gap: 8,
+  },
+  muted: {
+    color: Colors.primaryGrey,
+    fontSize: 15,
+    paddingVertical: 8,
   },
   row: {
     flexDirection: 'row',

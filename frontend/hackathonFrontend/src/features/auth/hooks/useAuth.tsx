@@ -7,6 +7,7 @@ import React, {
   useEffect,
   useState,
 } from 'react';
+import { AppState, type AppStateStatus } from 'react-native';
 import { AuthApi } from '../api/authApi';
 import type { AuthResponse, LoginRequest, User } from '../api/authTypes';
 
@@ -17,7 +18,7 @@ interface AuthContextType {
   error: string | null;
   login: (data: LoginRequest) => Promise<void>;
   logout: () => Promise<void>;
-  refreshProfile: () => Promise<void>;
+  refreshProfile: () => Promise<User | null>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -41,6 +42,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (savedToken && savedUser) {
           setToken(savedToken);
           setUser(JSON.parse(savedUser));
+          try {
+            const u = await AuthApi.getProfile(savedToken);
+            setUser(u);
+            await AsyncStorage.setItem(USER_KEY, JSON.stringify(u));
+          } catch (e) {
+            console.log('bootstrap getProfile', e);
+          }
         }
       } catch (e) {
         console.log('Ошибка загрузки auth', e);
@@ -81,18 +89,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await AsyncStorage.removeItem(USER_KEY);
   };
 
-  const refreshProfile = useCallback(async () => {
+  const refreshProfile = useCallback(async (): Promise<User | null> => {
     if (!token?.trim()) {
-      return;
+      return null;
     }
     try {
       const u = await AuthApi.getProfile(token);
       setUser(u);
       await AsyncStorage.setItem(USER_KEY, JSON.stringify(u));
+      return u;
     } catch (e) {
       console.log('refreshProfile', e);
+      return null;
     }
   }, [token]);
+
+  useEffect(() => {
+    if (!token?.trim() || isLoading) {
+      return;
+    }
+    const onChange = (state: AppStateStatus) => {
+      if (state === 'active') {
+        void refreshProfile();
+      }
+    };
+    const sub = AppState.addEventListener('change', onChange);
+    return () => sub.remove();
+  }, [token, isLoading, refreshProfile]);
 
   return (
     <AuthContext.Provider

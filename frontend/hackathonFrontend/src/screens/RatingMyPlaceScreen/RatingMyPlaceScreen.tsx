@@ -2,7 +2,9 @@ import { RatingDealerTop } from '@components/RatingScreenComponents/RatingDealer
 import { RatingMyRank } from '@components/RatingScreenComponents/RatingMyRank';
 import { RatingRegionTop } from '@components/RatingScreenComponents/RatingRegionTop';
 import { Colors } from '@constants/colors';
+import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
 import {
   ImageBackground,
   ScrollView,
@@ -11,9 +13,52 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useAuth } from 'src/features/auth/hooks/useAuth';
+import { fetchDealerCenterRating } from 'src/features/rating/api/dealerCenterRatingApi';
+import type { DealerCenterRatingResponse } from 'src/features/rating/api/dealerCenterRatingTypes';
 
 export default function RatingMyPlaceScreen() {
   const router = useRouter();
+  const { token, refreshProfile } = useAuth();
+  const [data, setData] = useState<DealerCenterRatingResponse | null>(null);
+  const [highlightUserId, setHighlightUserId] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    if (!token?.trim()) {
+      setError('Нет авторизации');
+      setLoading(false);
+      return;
+    }
+    setError(null);
+    setLoading(true);
+    try {
+      const freshUser = await refreshProfile();
+      const rating = await fetchDealerCenterRating(token);
+      setData(rating);
+      if (freshUser?.id != null) {
+        setHighlightUserId(freshUser.id);
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Ошибка загрузки');
+      setData(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [token, refreshProfile]);
+
+  useFocusEffect(
+    useCallback(() => {
+      void load();
+    }, [load]),
+  );
+
+  const hasDealer = Boolean((data?.dealer_code ?? '').trim());
+  const myRank = data?.my_rank ?? null;
+  const top10 = data?.top_10 ?? [];
+  const dealerTotals = data?.dealer_totals_top ?? [];
+  const myDealerCode = (data?.dealer_code ?? '').trim();
 
   return (
     <ImageBackground
@@ -31,14 +76,26 @@ export default function RatingMyPlaceScreen() {
           </TouchableOpacity>
         </View>
         <Text style={styles.screenTitle}>Мое место в компании</Text>
+        {error && !loading && (
+          <Text style={styles.errorBanner}>{error}</Text>
+        )}
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <RatingMyRank />
-          <RatingDealerTop />
-          <RatingRegionTop />
+          <RatingMyRank loading={loading} myRank={myRank} />
+          <RatingDealerTop
+            loading={loading}
+            rows={top10}
+            currentUserId={highlightUserId}
+            hasDealerCode={hasDealer}
+          />
+          <RatingRegionTop
+            loading={loading}
+            rows={dealerTotals}
+            myDealerCode={myDealerCode}
+          />
         </ScrollView>
       </View>
     </ImageBackground>
@@ -70,6 +127,11 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
+  },
+  errorBanner: {
+    color: '#ff8a80',
+    fontSize: 14,
+    marginBottom: 8,
   },
   scroll: {
     flex: 1,

@@ -20,10 +20,46 @@ export const Status = () => {
       setPointsNeeded(user.points_to_next_status);
   }, [user]);
 
-  // Минимальный прогресс: points / target
-  const progress = user?.volume_points
-    ? Math.min((user.volume_points / 200) * 100, 1) // 1000 — пример цели
-    : 0; // Заглушка на progressBar
+  const getLevelThreshold = (status: UserStatus) => {
+    switch (status) {
+      case 'silver':
+        return 70;
+      case 'gold':
+        return 90;
+      case 'platinum':
+        return 90;
+      default:
+        return 70;
+    }
+  };
+
+  const levelConfig = {
+    silver: { min: 0, max: 70 },
+    gold: { min: 70, max: 90 },
+    platinum: { min: 90, max: 100 }, // max можно увеличить, например 200
+  };
+
+  const getProgress = () => {
+    if (!user?.total_points || !user?.status) return 0;
+
+    const currentPoints = user.total_points;
+    const config = levelConfig[user.status];
+
+    if (!config) return 0;
+
+    const pointsInLevel = Math.min(
+      Math.max(currentPoints - config.min, 0),
+      config.max - config.min,
+    );
+
+    const levelRange = config.max - config.min;
+
+    // Прогресс в процентах от 0 до 100
+    return (pointsInLevel / levelRange) * 100;
+  };
+
+  // Использование
+  const progress = getProgress();
 
   const Icon = StatusIcon;
 

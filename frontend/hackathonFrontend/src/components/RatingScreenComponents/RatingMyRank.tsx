@@ -1,11 +1,22 @@
 import { Colors } from '@constants/colors';
 import { StyleSheet, Text, View } from 'react-native';
 
-export const RatingMyRank = () => {
+export type RatingMyRankProps = {
+  loading?: boolean;
+  myRank: number | null;
+};
+
+export const RatingMyRank = ({
+  loading = false,
+  myRank,
+}: RatingMyRankProps) => {
+  const rankText =
+    loading ? '…' : myRank != null ? String(myRank) : '—';
+
   return (
     <View style={styles.card}>
       <Text style={styles.label}>Мой номер в рейтинге</Text>
-      <Text style={styles.rank}>7</Text>
+      <Text style={styles.rank}>{rankText}</Text>
       <Text style={styles.hint}>внутри дилерского центра</Text>
     </View>
   );

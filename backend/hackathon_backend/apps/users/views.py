@@ -8,6 +8,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from .models import User
 from .monthly import apply_monthly_status_credits
+from .rating import build_dealer_center_rating
 from .serializers import UserSerializer, UserProfileUpdateSerializer
 
 logger = logging.getLogger(__name__)
@@ -39,6 +40,16 @@ class UserViewSet(viewsets.GenericViewSet):
             {'error': 'Method not allowed'},
             status=status.HTTP_405_METHOD_NOT_ALLOWED
         )
+
+    @action(
+        detail=False,
+        methods=['get'],
+        url_path='rating/dealer-center',
+        url_name='rating-dealer-center',
+    )
+    def rating_dealer_center(self, request):
+        """Топ-10 внутри ДЦ по total_points; топ дилерских центров по сумме баллов."""
+        return Response(build_dealer_center_rating(request.user))
 
 class LoginViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]

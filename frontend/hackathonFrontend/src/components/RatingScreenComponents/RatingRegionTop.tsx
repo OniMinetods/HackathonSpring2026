@@ -1,25 +1,51 @@
 import { Colors } from '@constants/colors';
 import { StyleSheet, Text, View } from 'react-native';
+import type { DealerTotalsTopRow } from 'src/features/rating/api/dealerCenterRatingTypes';
 
-const TOP = [
-  { place: 1, center: 'ДЦ «Север»', points: '12 480' },
-  { place: 2, center: 'ДЦ «Запад»', points: '11 902' },
-  { place: 3, center: 'ДЦ «Восток»', points: '11 540' },
-];
+export type RatingRegionTopProps = {
+  loading?: boolean;
+  rows: DealerTotalsTopRow[];
+  myDealerCode: string;
+};
 
-export const RatingRegionTop = () => {
+function formatSum(p: number): string {
+  return Math.round(p).toLocaleString('ru-RU');
+}
+
+export const RatingRegionTop = ({
+  loading = false,
+  rows,
+  myDealerCode,
+}: RatingRegionTopProps) => {
+  const myTrim = myDealerCode.trim();
+
   return (
     <View style={styles.card}>
       <Text style={styles.title}>Топ региона</Text>
       <Text style={styles.subtitle}>по сумме баллов дилеров</Text>
       <View style={styles.list}>
-        {TOP.map((item) => (
-          <View key={item.place} style={styles.row}>
-            <Text style={styles.place}>{item.place}</Text>
-            <Text style={styles.center}>{item.center}</Text>
-            <Text style={styles.points}>{item.points}</Text>
-          </View>
-        ))}
+        {loading && (
+          <Text style={styles.muted}>Загрузка…</Text>
+        )}
+        {!loading && rows.length === 0 && (
+          <Text style={styles.muted}>Нет данных по кодам ДЦ</Text>
+        )}
+        {!loading &&
+          rows.map((item) => (
+            <View
+              key={item.dealer_code}
+              style={[
+                styles.row,
+                myTrim !== '' && item.dealer_code === myTrim && styles.rowHighlight,
+              ]}
+            >
+              <Text style={styles.place}>{item.rank}</Text>
+              <Text style={styles.center} numberOfLines={1}>
+                ДЦ · {item.dealer_code}
+              </Text>
+              <Text style={styles.points}>{formatSum(item.total_points_sum)}</Text>
+            </View>
+          ))}
       </View>
     </View>
   );
@@ -45,6 +71,11 @@ const styles = StyleSheet.create({
   list: {
     gap: 10,
   },
+  muted: {
+    color: Colors.primaryGrey,
+    fontSize: 15,
+    paddingVertical: 8,
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -52,6 +83,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 14,
     backgroundColor: Colors.black50,
+  },
+  rowHighlight: {
+    borderWidth: 1,
+    borderColor: Colors.primaryGreenFourth,
   },
   place: {
     width: 24,
