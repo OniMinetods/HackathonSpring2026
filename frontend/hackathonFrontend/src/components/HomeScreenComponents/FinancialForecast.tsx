@@ -1,13 +1,13 @@
-import { Colors } from '@constants/colors';
-import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { UserStatus } from 'src/features/auth/api/authTypes';
-import { useAuth } from 'src/features/auth/hooks/useAuth';
-import { getNextStatus } from 'src/shared/functions';
+import { Colors } from "@constants/colors";
+import { useEffect, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { UserStatus } from "src/features/auth/api/authTypes";
+import { useAuth } from "src/features/auth/hooks/useAuth";
+import { getNextStatus } from "src/shared/functions";
 
 export const FinancialForecast = () => {
   const { user } = useAuth();
-  const [status, setStatus] = useState<UserStatus>('silver');
+  const [status, setStatus] = useState<UserStatus>("silver");
 
   useEffect(() => {
     if (user) setStatus(user.status);
@@ -22,7 +22,7 @@ export const FinancialForecast = () => {
       <View style={styles.metrics}>
         <View style={styles.metric}>
           <Text style={styles.metricLabel}>Годовой доход</Text>
-          <Text style={styles.metricValue}>111,111 ₽</Text>
+          <Text style={styles.metricValue}>180,000 ₽</Text>
         </View>
         <View style={styles.metricDivider} />
         <View style={styles.metric}>
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: Colors.white,
   },
   subtitle: {
@@ -67,11 +67,11 @@ const styles = StyleSheet.create({
   },
   metricValue: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: "600",
     color: Colors.white,
   },
   metricDivider: {
     height: 1,
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: "rgba(255,255,255,0.08)",
   },
 });
