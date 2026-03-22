@@ -1,7 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, date
+import calendar
 
 
 class User(AbstractUser):
@@ -50,6 +51,10 @@ class User(AbstractUser):
 
     last_status_update = models.DateTimeField('Дата последнего обновления уровня', blank=True, null=True)
 
+    # Поля для отслеживания месяцев в статусах за текущий год
+    months_silver_current_year = models.IntegerField('Месяцев в статусе Silver в текущем году', default=0)
+    months_gold_current_year = models.IntegerField('Месяцев в статусе Gold в текущем году', default=0)
+    months_platinum_current_year = models.IntegerField('Месяцев в статусе Platinum в текущем году', default=0)
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -138,12 +143,129 @@ class User(AbstractUser):
         needed = next_threshold - current_points
         return max(0, round(needed, 2))
 
-    def save(self, *args, **kwargs):
-        """При сохранении обновляем статус, если он изменился."""
+    @staticmethod
+    def _months_between(start_date, end_date):
+        """
+        Возвращает количество полных календарных месяцев между двумя датами.
+        """
+        if start_date > end_date:
+            return 0
+
+        # Преобразуем datetime в date, если необходимо
+        if hasattr(start_date, 'date'):
+            start_date = start_date.date()
+        if hasattr(end_date, 'date'):
+            end_date = end_date.date()
+
+        months = (end_date.year - start_date.year) * 12 + (end_date.month - start_date.month)
+
+        # Если день окончания меньше дня начала, вычитаем один неполный месяц
+        if end_date.day < start_date.day:
+            months -= 1
+
+        return max(0, months)
+
+    def _add_months_for_period(self, start_date, end_date, status):
+        """
+        Добавляет количество месяцев, проведённых в указанном статусе,
+        только за период, попадающий в текущий год.
+        """
+        current_year = timezone.now().year
+
+        # Преобразуем datetime в date, если необходимо
+        if hasattr(start_date, 'date'):
+            start_date = start_date.date()
+        if hasattr(end_date, 'date'):
+            end_date = end_date.date()
+
+        # Обрезаем период по границам текущего года
+        year_start = date(current_year, 1, 1)
+        year_end = date(current_year, 12, 31)
+
+        effective_start = max(start_date, year_start)
+        effective_end = min(end_date, year_end)
+
+        if effective_start > effective_end:
+            return
+
+        months = self._months_between(effective_start, effective_end)
+        if months <= 0:
+            return
+
+        if status == 'silver':
+            self.months_silver_current_year += months
+        elif status == 'gold':
+            self.months_gold_current_year += months
+        elif status == 'platinum':
+            self.months_platinum_current_year += months
+
+    def monthly_status_update(self, check_date=None):
+        """
+        Выполняет ежемесячное обновление статуса пользователя.
+        Если check_date не указан, используется текущая дата.
+        """
+        if check_date is None:
+            now = timezone.now().date()
+        else:
+            if hasattr(check_date, 'date'):
+                now = check_date.date()
+            else:
+                now = check_date
+
+        # Если дата последнего обновления не установлена, используем дату регистрации
+        if self.last_status_update is None:
+            if hasattr(self, 'date_joined') and self.date_joined:
+                if hasattr(self.date_joined, 'date'):
+                    self.last_status_update = self.date_joined.date()
+                else:
+                    self.last_status_update = self.date_joined
+            else:
+                self.last_status_update = now
+
+        last_date = self.last_status_update
+        if hasattr(last_date, 'date'):
+            last_date = last_date.date()
+
+        if last_date > now:
+            return  # некорректные даты
+
+        # Проверяем, прошёл ли хотя бы один полный календарный месяц
+        months_passed = self._months_between(last_date, now)
+        if months_passed == 0:
+            return  # обновление ещё не требуется
+
+        # Добавляем месяцы, проведённые в текущем статусе за прошедший период
+        self._add_months_for_period(last_date, now, self.status)
+
+        # Пересчитываем статус на основе текущих баллов
         new_status = self.current_status
-
-        if self.status != new_status:
+        if new_status != self.status:
             self.status = new_status
-            self.last_status_update = timezone.now()
 
+        # Обновляем дату последнего обновления
+        self.last_status_update = now
+        self.save(update_fields=[
+            'status', 'last_status_update',
+            'months_silver_current_year', 'months_gold_current_year', 'months_platinum_current_year'
+        ])
+
+    def reset_yearly_status_months(self):
+        """
+        Сбрасывает счетчики месяцев для нового года.
+        Эту функцию нужно вызывать в начале каждого года (например, 1 января).
+        """
+        self.months_silver_current_year = 0
+        self.months_gold_current_year = 0
+        self.months_platinum_current_year = 0
+        self.save(update_fields=[
+            'months_silver_current_year',
+            'months_gold_current_year',
+            'months_platinum_current_year'
+        ])
+
+    def save(self, *args, **kwargs):
+        """
+        Сохраняет пользователя без автоматического обновления статуса.
+        Обновление статуса происходит только через monthly_status_update.
+        """
         super().save(*args, **kwargs)

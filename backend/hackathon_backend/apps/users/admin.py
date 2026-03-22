@@ -24,7 +24,8 @@ class CustomUserAdmin(UserAdmin):
             'fields': (
                 'volume_of_transactions', 'number_of_transactions', 'bank_share',
                 'conversion_rate', 'volume_points', 'deals_points', 'share_points',
-                'conversion_points', 'total_points'
+                'conversion_points', 'total_points',
+                'months_silver_current_year', 'months_gold_current_year', 'months_platinum_current_year'
             )
         }),
         (_('Плановые показатели'), {
