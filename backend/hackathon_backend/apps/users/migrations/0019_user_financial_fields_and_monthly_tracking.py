@@ -29,14 +29,14 @@ class Migration(migrations.Migration):
                 verbose_name='Последний учтённый месяц (YYYY-MM)',
             ),
         ),
-        migrations.AddField(
-            model_name='user',
-            name='bonus_income_yearly_rub',
-            field=models.PositiveIntegerField(
-                default=0,
-                verbose_name='Доп. доход от бонусов за год (₽)',
-            ),
-        ),
+        # migrations.AddField(
+        #     model_name='user',
+        #     name='bonus_income_yearly_rub',
+        #     field=models.PositiveIntegerField(
+        #         default=0,
+        #         verbose_name='Доп. доход от бонусов за год (₽)',
+        #     ),
+        # ),
         migrations.AddField(
             model_name='user',
             name='mortgage_savings_yearly_rub',

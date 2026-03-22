@@ -48,7 +48,7 @@ class UserViewSet(viewsets.GenericViewSet):
         url_name='rating-dealer-center',
     )
     def rating_dealer_center(self, request):
-        """Топ-10 внутри ДЦ по total_points; топ дилерских центров по сумме баллов."""
+        """Топ-10 внутри ДЦ по total_points; топ дилерских центров по сумме баллов (код ДЦ)."""
         return Response(build_dealer_center_rating(request.user))
 
 class LoginViewSet(viewsets.ViewSet):

@@ -146,27 +146,24 @@ export default function DayResultsScreen() {
                 onChangeText={setProducts}
                 keyboardType="number-pad"
               />
-              <TouchableOpacity
-                style={[styles.saveBtn, saving && styles.saveBtnDisabled]}
-                onPress={() => void onSave()}
-                disabled={saving}
-                activeOpacity={0.85}
-              >
-                {saving ? (
-                  <ActivityIndicator color={Colors.white} />
-                ) : (
-                  <Text style={styles.saveBtnText}>Сохранить</Text>
-                )}
-              </TouchableOpacity>
-              {savedHint && (
-                <Text style={styles.savedHint}>{savedHint}</Text>
-              )}
-              <View style={styles.detailWrap}>
-                <GreenStackButton title="Детализация" href="/rating-detail" />
+              <View style={styles.buttons}>
+                <TouchableOpacity
+                  style={[styles.saveBtn, saving && styles.saveBtnDisabled]}
+                  onPress={() => void onSave()}
+                  disabled={saving}
+                  activeOpacity={0.85}
+                >
+                  {saving ? (
+                    <ActivityIndicator color={Colors.black} />
+                  ) : (
+                    <Text style={styles.saveBtnText}>Сохранить</Text>
+                  )}
+                </TouchableOpacity>
+                {savedHint && <Text style={styles.savedHint}>{savedHint}</Text>}
+                <View style={styles.detailWrap}>
+                  <GreenStackButton title="Детализация" href="/rating-detail" />
+                </View>
               </View>
-              <Text style={styles.detailHint}>
-                Переход к экрану «Детализация рейтинга»
-              </Text>
             </ScrollView>
           )}
         </View>
@@ -206,6 +203,11 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
+  },
+  buttons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 20,
   },
   flex: { flex: 1 },
   root: {
@@ -264,17 +266,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   saveBtn: {
+    alignSelf: 'center',
     marginTop: 8,
-    borderRadius: 12,
-    paddingVertical: 18,
-    backgroundColor: Colors.primaryGreenFirst,
+    borderRadius: 999,
+    paddingVertical: 16,
+    paddingHorizontal: 28,
+    backgroundColor: Colors.white,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.12)',
   },
   saveBtnDisabled: {
     opacity: 0.7,
   },
   saveBtnText: {
     textAlign: 'center',
-    color: Colors.white,
+    color: Colors.black,
     fontSize: 17,
     fontWeight: '600',
   },
@@ -285,6 +291,7 @@ const styles = StyleSheet.create({
   },
   detailWrap: {
     marginTop: 12,
+    alignItems: 'center',
   },
   detailHint: {
     color: Colors.primaryGrey,

@@ -22,7 +22,9 @@ export const RatingRegionTop = ({
   return (
     <View style={styles.card}>
       <Text style={styles.title}>Топ региона</Text>
-      <Text style={styles.subtitle}>по сумме баллов дилеров</Text>
+      <Text style={styles.subtitle}>
+        по сумме баллов дилеров (топ-10 по коду ДЦ)
+      </Text>
       <View style={styles.list}>
         {loading && (
           <Text style={styles.muted}>Загрузка…</Text>

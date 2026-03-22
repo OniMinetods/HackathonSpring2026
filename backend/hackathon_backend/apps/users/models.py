@@ -65,14 +65,14 @@ class User(AbstractUser):
         null=True,
     )
 
-    bonus_income_yearly_rub = models.PositiveIntegerField(
-        'Доп. доход от бонусов за год (₽)', default=0
-    )
-    mortgage_savings_yearly_rub = models.PositiveIntegerField(
-        'Экономия по ипотеке за год (₽)', default=0
-    )
-    cashback_yearly_rub = models.PositiveIntegerField('Кэшбэк за год (₽)', default=0)
-    dms_yearly_rub = models.PositiveIntegerField('ДМС стоимость за год (₽)', default=0)
+    # bonus_income_yearly_rub = models.PositiveIntegerField(
+    #     'Доп. доход от бонусов за год (₽)', default=0
+    # )
+    # mortgage_savings_yearly_rub = models.PositiveIntegerField(
+    #     'Экономия по ипотеке за год (₽)', default=0
+    # )
+    # cashback_yearly_rub = models.PositiveIntegerField('Кэшбэк за год (₽)', default=0)
+    # dms_yearly_rub = models.PositiveIntegerField('ДМС стоимость за год (₽)', default=0)
 
     class Meta:
         verbose_name = 'Пользователь'

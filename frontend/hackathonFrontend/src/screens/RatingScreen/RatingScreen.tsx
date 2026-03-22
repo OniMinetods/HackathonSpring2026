@@ -33,10 +33,12 @@ export default function RatingScreen() {
           showsVerticalScrollIndicator={false}
         >
           <RatingDetailSection />
-          <GreenStackButton
-            title="Мое место в компании"
-            href="/rating-my-place"
-          />
+          <View style={styles.pillStack}>
+            <GreenStackButton
+              title="Мое место в компании"
+              href="/rating-my-place"
+            />
+          </View>
         </ScrollView>
       </View>
     </ImageBackground>
@@ -72,5 +74,10 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 24,
     gap: 12,
+  },
+  pillStack: {
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 4,
   },
 });

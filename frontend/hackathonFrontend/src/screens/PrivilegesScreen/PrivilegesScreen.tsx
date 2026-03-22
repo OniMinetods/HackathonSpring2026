@@ -3,13 +3,13 @@ import { PrivilegeItemCard } from '@components/PrivilegesScreenComponents/Privil
 import { Colors } from '@constants/colors';
 import { useRouter } from 'expo-router';
 import {
-  ActivityIndicator,
-  ImageBackground,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    ImageBackground,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import type { UserStatus } from 'src/features/auth/api/authTypes';
 import { useAuth } from 'src/features/auth/hooks/useAuth';
@@ -160,13 +160,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   retry: {
+    alignSelf: 'center',
     paddingVertical: 12,
     paddingHorizontal: 24,
-    borderRadius: 20,
-    backgroundColor: Colors.primaryGreenFirst,
+    borderRadius: 999,
+    backgroundColor: Colors.white,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.12)',
   },
   retryText: {
-    color: Colors.white,
+    color: Colors.black,
     fontSize: 16,
     fontWeight: '600',
   },

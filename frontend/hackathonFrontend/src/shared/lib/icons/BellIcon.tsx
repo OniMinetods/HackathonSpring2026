@@ -1,6 +1,6 @@
-import * as React from 'react';
-import Svg, { Path } from 'react-native-svg';
-import { Colors } from '../../../shared/constants/colors';
+import * as React from 'react'
+import Svg, { Path } from 'react-native-svg'
+import { Colors } from '../../../shared/constants/colors'
 
 interface BellIconProps {
   width?: number;
@@ -9,9 +9,9 @@ interface BellIconProps {
 }
 
 export const BellIcon = ({
-  width = 30,
-  height = 35,
-  color = Colors.primaryGreenFourth,
+  width = 25,
+  height = 30,
+  color = Colors.white,
 }: BellIconProps) => {
   return (
     <Svg width={width} height={height} viewBox="0 0 30 35" fill="none">

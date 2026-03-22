@@ -29,12 +29,12 @@ class CustomUserAdmin(UserAdmin):
                 'months_platinum_current_year', 'months_year_tracker', 'last_monthly_credit_ym',
             )
         }),
-        (_('Личный финансовый эффект (год)'), {
-            'fields': (
-                'bonus_income_yearly_rub', 'mortgage_savings_yearly_rub',
-                'cashback_yearly_rub', 'dms_yearly_rub',
-            )
-        }),
+        # (_('Личный финансовый эффект (год)'), {
+        #     'fields': (
+        #         'bonus_income_yearly_rub', 'mortgage_savings_yearly_rub',
+        #         'cashback_yearly_rub', 'dms_yearly_rub',
+        #     )
+        # }),
         (_('Плановые показатели'), {
             'fields': (
                 'volume_of_transactions_plan', 'number_of_transactions_plan',

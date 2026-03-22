@@ -1,13 +1,12 @@
 // features/auth/hooks/useAuth.ts
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useState,
 } from 'react';
-import { AppState, type AppStateStatus } from 'react-native';
 import { AuthApi } from '../api/authApi';
 import type { AuthResponse, LoginRequest, User } from '../api/authTypes';
 
@@ -42,13 +41,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (savedToken && savedUser) {
           setToken(savedToken);
           setUser(JSON.parse(savedUser));
-          try {
-            const u = await AuthApi.getProfile(savedToken);
-            setUser(u);
-            await AsyncStorage.setItem(USER_KEY, JSON.stringify(u));
-          } catch (e) {
-            console.log('bootstrap getProfile', e);
-          }
         }
       } catch (e) {
         console.log('Ошибка загрузки auth', e);
@@ -103,19 +95,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return null;
     }
   }, [token]);
-
-  useEffect(() => {
-    if (!token?.trim() || isLoading) {
-      return;
-    }
-    const onChange = (state: AppStateStatus) => {
-      if (state === 'active') {
-        void refreshProfile();
-      }
-    };
-    const sub = AppState.addEventListener('change', onChange);
-    return () => sub.remove();
-  }, [token, isLoading, refreshProfile]);
 
   return (
     <AuthContext.Provider
