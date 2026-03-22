@@ -1,7 +1,7 @@
 import { GreenStackButton } from '@components/GreenStackButton';
 import { Colors } from '@constants/colors';
 import { useRouter } from 'expo-router';
-import type { PrivilegeItem } from 'src/features/privileges/model/privilegesData';
+import type { PrivilegeItem } from 'src/features/privileges/model/privilegeTypes';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export type PrivilegeItemCardProps = {

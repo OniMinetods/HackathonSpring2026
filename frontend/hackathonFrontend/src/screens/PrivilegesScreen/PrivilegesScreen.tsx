@@ -2,6 +2,7 @@ import { PrivilegeItemCard } from '@components/PrivilegesScreenComponents/Privil
 import { Colors } from '@constants/colors';
 import { useRouter } from 'expo-router';
 import {
+  ActivityIndicator,
   ImageBackground,
   ScrollView,
   StyleSheet,
@@ -11,10 +12,10 @@ import {
 } from 'react-native';
 import type { UserStatus } from 'src/features/auth/api/authTypes';
 import { useAuth } from 'src/features/auth/hooks/useAuth';
-import { PRIVILEGES_BY_TIER } from 'src/features/privileges/model/privilegesData';
+import { usePrivileges } from 'src/features/privileges/hooks/usePrivileges';
 
 function tierTitle(s: UserStatus): string {
-  if (s === 'platinum') return 'Black';
+  if (s === 'platinum') return 'Platinum';
   return s[0].toUpperCase() + s.slice(1);
 }
 
@@ -22,7 +23,7 @@ export default function PrivilegesScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const tier = (user?.status ?? 'silver') as UserStatus;
-  const { active, blocked } = PRIVILEGES_BY_TIER[tier];
+  const { active, blocked, loading, error, refetch } = usePrivileges(tier);
 
   return (
     <ImageBackground
@@ -36,29 +37,48 @@ export default function PrivilegesScreen() {
             onPress={() => router.back()}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Text style={styles.back}>← Назад</Text>
+            <Text style={styles.back}>Назад</Text>
           </TouchableOpacity>
         </View>
         <Text style={styles.h1}>Привилегии уровня</Text>
         <Text style={styles.sub}>Ваш уровень: {tierTitle(tier)}</Text>
-        <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          <Text style={styles.section}>Активные</Text>
-          {active.map((p) => (
-            <PrivilegeItemCard key={p.id} item={p} />
-          ))}
-          <Text style={[styles.section, styles.sectionSecond]}>
-            Заблокированные
-          </Text>
-          {blocked.length === 0 ? (
-            <Text style={styles.empty}>Нет заблокированных привилегий</Text>
-          ) : (
-            blocked.map((p) => <PrivilegeItemCard key={p.id} item={p} />)
-          )}
-        </ScrollView>
+        {loading ? (
+          <View style={styles.centered}>
+            <ActivityIndicator size="large" color={Colors.primaryGreenFourth} />
+            <Text style={styles.muted}>Загрузка…</Text>
+          </View>
+        ) : error ? (
+          <View style={styles.centered}>
+            <Text style={styles.error}>{error}</Text>
+            <TouchableOpacity
+              onPress={() => void refetch()}
+              style={styles.retry}
+            >
+              <Text style={styles.retryText}>Повторить</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <ScrollView
+            style={styles.scroll}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            <Text style={styles.section}>Активные</Text>
+            {active.length === 0 ? (
+              <Text style={styles.empty}>Нет активных привилегий</Text>
+            ) : (
+              active.map((p) => <PrivilegeItemCard key={p.id} item={p} />)
+            )}
+            <Text style={[styles.section, styles.sectionSecond]}>
+              Заблокированные
+            </Text>
+            {blocked.length === 0 ? (
+              <Text style={styles.empty}>Нет заблокированных привилегий</Text>
+            ) : (
+              blocked.map((p) => <PrivilegeItemCard key={p.id} item={p} />)
+            )}
+          </ScrollView>
+        )}
       </View>
     </ImageBackground>
   );
@@ -81,7 +101,7 @@ const styles = StyleSheet.create({
   },
   back: {
     color: Colors.primaryGreenFourth,
-    fontSize: 17,
+    fontSize: 20,
     fontWeight: '600',
   },
   h1: {
@@ -115,5 +135,33 @@ const styles = StyleSheet.create({
     color: Colors.primaryGrey,
     fontSize: 15,
     paddingVertical: 8,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 24,
+  },
+  muted: {
+    color: Colors.primaryGrey,
+    fontSize: 15,
+  },
+  error: {
+    color: '#ff8a80',
+    fontSize: 15,
+    textAlign: 'center',
+    paddingHorizontal: 16,
+  },
+  retry: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 20,
+    backgroundColor: Colors.primaryGreenFirst,
+  },
+  retryText: {
+    color: Colors.white,
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
