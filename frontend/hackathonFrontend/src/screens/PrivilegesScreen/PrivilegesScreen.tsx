@@ -1,3 +1,4 @@
+import { GreenStackButton } from '@components/GreenStackButton';
 import { PrivilegeItemCard } from '@components/PrivilegesScreenComponents/PrivilegeItemCard';
 import { Colors } from '@constants/colors';
 import { useRouter } from 'expo-router';
@@ -72,11 +73,16 @@ export default function PrivilegesScreen() {
             <Text style={[styles.section, styles.sectionSecond]}>
               Заблокированные
             </Text>
+
             {blocked.length === 0 ? (
               <Text style={styles.empty}>Нет заблокированных привилегий</Text>
             ) : (
               blocked.map((p) => <PrivilegeItemCard key={p.id} item={p} />)
             )}
+            <GreenStackButton
+              title="Рассчитать новый статус"
+              href="/calculator"
+            />
           </ScrollView>
         )}
       </View>
@@ -120,7 +126,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 32,
-    gap: 12,
+    gap: 8,
   },
   section: {
     color: Colors.white,
