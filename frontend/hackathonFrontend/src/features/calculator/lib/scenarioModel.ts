@@ -1,4 +1,4 @@
-import type { UserStatus } from 'src/features/auth/api/authTypes';
+import type { UserStatus } from 'src/features/auth/api/authTypes'
 
 /** Баллы за единицу сценария (согласовано с разбивкой рейтинга в ТЗ). */
 export const POINTS_PER_EXTRA_DEAL = 6;

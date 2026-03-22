@@ -1,7 +1,6 @@
-import { Colors } from '@constants/colors';
-import type { UserStatus } from 'src/features/auth/api/authTypes';
-import { tierLabelForPdf } from 'src/features/calculator/lib/scenarioModel';
-import { StyleSheet, Text, View } from 'react-native';
+import { Colors } from '@constants/colors'
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import type { ScenarioCalculatorResponse } from 'src/features/calculator/api/scenarioApiTypes'
 
 type RowProps = { title: string; value: string; accent?: boolean };
 
@@ -15,38 +14,68 @@ const Row = ({ title, value, accent }: RowProps) => (
 );
 
 export type ScenarioOutcomeCardProps = {
-  ratingPoints: number;
-  projectedStatus: UserStatus;
-  yearlyIncomeRub: number;
-  mortgageSavingsRub: number;
+  loading: boolean;
+  error: string | null;
+  outcome: ScenarioCalculatorResponse | null;
 };
 
+function formatDelta(v: number): string {
+  const s = v >= 0 ? `+${v}` : `${v}`;
+  return `${s} баллов`;
+}
+
 export const ScenarioOutcomeCard = ({
-  ratingPoints,
-  projectedStatus,
-  yearlyIncomeRub,
-  mortgageSavingsRub,
+  loading,
+  error,
+  outcome,
 }: ScenarioOutcomeCardProps) => {
-  const incomeStr = yearlyIncomeRub.toLocaleString('ru-RU');
-  const savingsStr = mortgageSavingsRub.toLocaleString('ru-RU');
+  const incomeStr =
+    outcome?.yearly_income_rub.toLocaleString('ru-RU') ?? '—';
+  const savingsStr =
+    outcome?.mortgage_savings_rub.toLocaleString('ru-RU') ?? '—';
 
   return (
     <View style={styles.card}>
       <Text style={styles.sectionTitle}>Пересчёт</Text>
       <Text style={styles.sectionHint}>обновляется при движении ползунков</Text>
-      <View style={styles.block}>
-        <Row title="Новый рейтинг" value={`${ratingPoints} баллов`} accent />
-        <View style={styles.divider} />
-        <Row
-          title="Новый уровень"
-          value={tierLabelForPdf(projectedStatus)}
-          accent
-        />
-        <View style={styles.divider} />
-        <Row title="Новый доход (год)" value={`${incomeStr} ₽`} />
-        <View style={styles.divider} />
-        <Row title="Новая экономия (ипотека)" value={`${savingsStr} ₽`} />
-      </View>
+
+      {loading && (
+        <View style={styles.centerRow}>
+          <ActivityIndicator color={Colors.primaryGreenFourth} />
+          <Text style={styles.hint}>Считаем на сервере…</Text>
+        </View>
+      )}
+
+      {error && !loading && (
+        <Text style={styles.errorText}>{error}</Text>
+      )}
+
+      {!error && outcome && (
+        <View style={[styles.block, loading && styles.blockDimmed]}>
+          <Row
+            title="Исходные баллы (с клиента)"
+            value={`${outcome.total_points} баллов`}
+          />
+          <View style={styles.divider} />
+          <Row
+            title="Новый рейтинг"
+            value={`${outcome.projected_total_points} баллов`}
+            accent
+          />
+          <View style={styles.divider} />
+          <Row title="Изменение" value={formatDelta(outcome.delta_points)} />
+          <View style={styles.divider} />
+          <Row
+            title="Новый уровень"
+            value={outcome.projected_tier_label}
+            accent
+          />
+          <View style={styles.divider} />
+          <Row title="Новый доход (год)" value={`${incomeStr} ₽`} />
+          <View style={styles.divider} />
+          <Row title="Новая экономия (ипотека)" value={`${savingsStr} ₽`} />
+        </View>
+      )}
     </View>
   );
 };
@@ -68,11 +97,29 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 8,
   },
+  centerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 16,
+  },
+  hint: {
+    color: Colors.primaryGrey,
+    fontSize: 15,
+  },
+  errorText: {
+    color: '#ff8a80',
+    fontSize: 15,
+    paddingVertical: 8,
+  },
   block: {
     backgroundColor: Colors.primaryDark,
     borderRadius: 16,
     paddingVertical: 8,
     paddingHorizontal: 4,
+  },
+  blockDimmed: {
+    opacity: 0.55,
   },
   row: {
     paddingVertical: 12,

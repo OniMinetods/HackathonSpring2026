@@ -1,10 +1,9 @@
-import { CalculatorCurrentStatus } from '@components/CalculatorScreenComponents/CalculatorCurrentStatus';
-import { ScenarioOutcomeCard } from '@components/CalculatorScreenComponents/ScenarioOutcomeCard';
-import { ScenarioSlider } from '@components/CalculatorScreenComponents/ScenarioSlider';
-import { API_ROUTES } from '@constants/API_ROUTES';
-import { Colors } from '@constants/colors';
-import { useRouter } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { CalculatorCurrentStatus } from '@components/CalculatorScreenComponents/CalculatorCurrentStatus'
+import { ScenarioOutcomeCard } from '@components/CalculatorScreenComponents/ScenarioOutcomeCard'
+import { ScenarioSlider } from '@components/CalculatorScreenComponents/ScenarioSlider'
+import { Colors } from '@constants/colors'
+import { useRouter } from 'expo-router'
+import { useEffect, useState } from 'react'
 import {
   ImageBackground,
   ScrollView,
@@ -12,11 +11,12 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native';
-import { UserStatus } from 'src/features/auth/api/authTypes';
-import { useAuth } from 'src/features/auth/hooks/useAuth';
-import { computeScenario } from 'src/features/calculator/lib/scenarioModel';
-import { useDebounce } from '../hooks/useDebounce';
+} from 'react-native'
+import { UserStatus } from 'src/features/auth/api/authTypes'
+import { useAuth } from 'src/features/auth/hooks/useAuth'
+import { postScenarioCalculator } from 'src/features/calculator/api/scenarioApi'
+import type { ScenarioCalculatorResponse } from 'src/features/calculator/api/scenarioApiTypes'
+import { useDebounce } from '../hooks/useDebounce'
 
 const MAX_DEALS = 15;
 const MAX_VOLUME_MILLION = 30;
@@ -25,7 +25,7 @@ const MAX_PRODUCTS = 12;
 
 export default function CalculatorForm() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const basePoints = user?.total_points ?? 0;
   const [currentStatus, setCurrentStatus] = useState<UserStatus>('silver');
 
@@ -45,59 +45,72 @@ export default function CalculatorForm() {
   const debouncedShareSteps = useDebounce(extraShareSteps, 500);
   const debouncedProducts = useDebounce(extraProducts, 500);
 
-  useEffect(() => {
-    // Отправляем только когда debounced значения стабилизировались
-    const sendData = async () => {
-      console.log('Отправка на API:', {
-        extraDeals: debouncedDeals,
-        extraVolumeMillion: debouncedVolume,
-        extraShareSteps: debouncedShareSteps,
-        extraProducts: debouncedProducts,
-      });
-
-      try {
-        const response = await fetch(`${API_ROUTES}/users/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            extraDeals: debouncedDeals,
-            extraVolumeMillion: debouncedVolume,
-            extraShareSteps: debouncedShareSteps,
-            extraProducts: debouncedProducts,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Ошибка отправки');
-        }
-
-        console.log('Данные успешно отправлены');
-      } catch (error) {
-        console.error('Ошибка:', error);
-      }
-    };
-
-    sendData();
-  }, [debouncedDeals, debouncedVolume, debouncedShareSteps, debouncedProducts]);
-
-  const outcome = useMemo(
-    () =>
-      computeScenario(basePoints, {
-        extraDeals,
-        extraVolumeMillion,
-        extraShareSteps,
-        extraProducts,
-      }),
-    [
-      basePoints,
-      extraDeals,
-      extraVolumeMillion,
-      extraShareSteps,
-      extraProducts,
-    ],
+  const [outcome, setOutcome] = useState<ScenarioCalculatorResponse | null>(
+    null,
   );
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!token?.trim()) {
+      setOutcome(null);
+      setError('Войдите в аккаунт, чтобы получить пересчёт с сервера.');
+      setLoading(false);
+      return;
+    }
+
+    const ac = new AbortController();
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    void (async () => {
+      try {
+        const data = await postScenarioCalculator(
+          token,
+          {
+            total_points: basePoints,
+            extra_deals: debouncedDeals,
+            extra_volume_million: debouncedVolume,
+            extra_share_steps: debouncedShareSteps,
+            extra_products: debouncedProducts,
+          },
+          ac.signal,
+        );
+        if (cancelled) {
+          return;
+        }
+        setOutcome(data);
+      } catch (e: unknown) {
+        if (cancelled) {
+          return;
+        }
+        if (e instanceof Error && e.name === 'AbortError') {
+          return;
+        }
+        const msg =
+          e instanceof Error ? e.message : 'Не удалось выполнить пересчёт';
+        setError(msg);
+        setOutcome(null);
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      ac.abort();
+    };
+  }, [
+    token,
+    basePoints,
+    debouncedDeals,
+    debouncedVolume,
+    debouncedShareSteps,
+    debouncedProducts,
+  ]);
 
   return (
     <ImageBackground
@@ -161,10 +174,9 @@ export default function CalculatorForm() {
             onValueChange={(v) => setExtraProducts(Math.round(v))}
           />
           <ScenarioOutcomeCard
-            ratingPoints={outcome.projectedPoints}
-            projectedStatus={outcome.projectedStatus}
-            yearlyIncomeRub={outcome.yearlyIncomeRub}
-            mortgageSavingsRub={outcome.mortgageSavingsRub}
+            loading={loading}
+            error={error}
+            outcome={outcome}
           />
         </ScrollView>
       </View>
